@@ -1,10 +1,7 @@
 package com.redecuidar.dto;
 
-import jakarta.persistence.*;
-import
-
-
 public class UpdateUsuarioDTO {
+
     private String nome;
     private String email;
     private String senha;
@@ -17,19 +14,7 @@ public class UpdateUsuarioDTO {
     private String descricao;
     private String experiencia;
 
-
-
-    // outros campos editáveis
-
     // Getters e Setters
-    // Getters e Setters
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getNome() {
         return nome;
     }

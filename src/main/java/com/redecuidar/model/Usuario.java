@@ -1,5 +1,5 @@
 package com.redecuidar.model;
-
+import java.util.Optional;
 import jakarta.persistence.*;
 
 @Entity

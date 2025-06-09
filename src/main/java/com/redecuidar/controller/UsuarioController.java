@@ -1,11 +1,12 @@
 package com.redecuidar.controller;
 
+import com.redecuidar.dto.UpdateUsuarioDTO;
 import com.redecuidar.model.Usuario;
-import com.redecuidar.repository.UsuarioRepository;
+import com.redecuidar.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,43 +17,58 @@ import java.util.List;
 public class UsuarioController {
 
     @Autowired
-    private UsuarioRepository usuarioRepository;
+    private UsuarioService usuarioService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
+    // GET - Listar todos os usuários
     @GetMapping
-    public List<Usuario> listarTodos() {
-        return usuarioRepository.findAll();
+    public ResponseEntity<List<Usuario>> listarTodos() {
+        List<Usuario> usuarios = usuarioService.listarTodos();
+        return ResponseEntity.ok(usuarios);
     }
 
+    // GET - Buscar por ID
     @GetMapping("/{id}")
-    public Usuario buscarPorId(@PathVariable Long id) {
-        return usuarioRepository.findById(id).orElse(null);
+    public ResponseEntity<Usuario> buscarPorId(@PathVariable Long id) {
+        Usuario usuario = usuarioService.buscarPorId(id);
+        if (usuario != null) {
+            return ResponseEntity.ok(usuario);
+        }
+        return ResponseEntity.notFound().build();
     }
 
+    // POST - Cadastro de novo usuário
     @PostMapping("/cadastro")
     public ResponseEntity<Usuario> cadastrarUsuario(@RequestBody Usuario usuario) {
-        // Verifica se já existe email cadastrado
-        if (usuarioRepository.findByEmail(usuario.getEmail()) != null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build(); // 409 - Conflito
+        Usuario novo = usuarioService.cadastrar(usuario);
+        if (novo == null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build(); // Email já existe
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(novo);
+    }
+
+    // PUT - Atualizar perfil do próprio usuário
+    @PutMapping("/{id}")
+    public ResponseEntity<?> atualizarUsuario(
+            @PathVariable Long id,
+            @RequestBody UpdateUsuarioDTO dto,
+            Authentication authentication) {
+
+        if (authentication == null || authentication.getName() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não autenticado");
         }
 
-        // Criptografa a senha antes de salvar
-        usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
-        Usuario novoUsuario = usuarioRepository.save(usuario);
-
-        return ResponseEntity.ok(novoUsuario);
+        String emailLogado = authentication.getName();
+        return usuarioService.atualizarUsuario(id, dto, emailLogado);
     }
 
-    @PutMapping("/{id}")
-    public Usuario atualizar(@PathVariable Long id, @RequestBody Usuario usuario) {
-        usuario.setId(id);
-        return usuarioRepository.save(usuario);
-    }
-
+    // DELETE - Excluir a própria conta
     @DeleteMapping("/{id}")
-    public void excluir(@PathVariable Long id) {
-        usuarioRepository.deleteById(id);
+    public ResponseEntity<?> excluirConta(@PathVariable Long id, Authentication authentication) {
+        if (authentication == null || authentication.getName() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não autenticado");
+        }
+
+        String emailLogado = authentication.getName();
+        return usuarioService.excluirConta(id, emailLogado);
     }
 }

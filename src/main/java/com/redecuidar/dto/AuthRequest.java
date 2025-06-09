@@ -4,6 +4,15 @@ public class AuthRequest {
     private String email;
     private String senha;
 
+    public AuthRequest() {
+        // Construtor padrão necessário para desserialização JSON
+    }
+
+    public AuthRequest(String email, String senha) {
+        this.email = email;
+        this.senha = senha;
+    }
+
     public String getEmail() {
         return email;
     }

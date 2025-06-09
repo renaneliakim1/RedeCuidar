@@ -1,4 +1,4 @@
-package com.redecuidar.service;
+package com.redecuidar.config;
 
 import com.redecuidar.model.Usuario;
 import com.redecuidar.repository.UsuarioRepository;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 
 @Service
-public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -19,10 +19,10 @@ public class UserDetailsService implements org.springframework.security.core.use
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
 
-        return new org.springframework.security.core.userdetails.User(
+        return new User(
                 usuario.getEmail(),
                 usuario.getSenha(),
-                Collections.emptyList() // sem roles por enquanto
+                Collections.emptyList() // Nenhuma role/permissão por enquanto
         );
     }
 }
