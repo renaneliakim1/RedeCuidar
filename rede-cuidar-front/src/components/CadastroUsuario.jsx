@@ -260,6 +260,7 @@ const handleRegistro = async (values) => {
                 size="large"
                 sx={{ mt: 2 }}
               >
+
                 Cadastrar
               </Button>
             </Form>
