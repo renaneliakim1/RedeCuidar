@@ -10,10 +10,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -30,21 +31,28 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<String> login(@RequestParam String email, @RequestParam String senha) {
         try {
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginDto.getEmail(),
-                            loginDto.getSenha()
-                    )
+                    new UsernamePasswordAuthenticationToken(email, senha)
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            return ResponseEntity.ok("Login realizado com sucesso");
+
+            Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
+            if (usuarioOpt.isPresent()) {
+                Usuario usuario = usuarioOpt.get();
+                return ResponseEntity.ok(usuario.getNome()); // <-- Retorna só o nome como texto plano
+            } else {
+                return ResponseEntity.status(404).body("Usuario não encontrado");
+            }
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(401).body("Credenciais inválidas");
         }
     }
+
+
+
 
 /*    @PostMapping("/registro")
     public ResponseEntity<?> registrar(@RequestBody Usuario usuario) {

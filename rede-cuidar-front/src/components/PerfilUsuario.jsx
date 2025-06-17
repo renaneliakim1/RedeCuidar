@@ -3,9 +3,9 @@ import { Box, Typography } from '@mui/material';
 
 const PerfilUsuario = () => {
   return (
-    <Box>
+    <Box sx={{ p: 3 }}>
       <Typography variant="h4">Perfil do Usuário</Typography>
-      {/* Conteúdo do perfil será adicionado aqui */}
+      {/* Aqui você pode exibir dados do usuário com fetch ou localStorage */}
     </Box>
   );
 };

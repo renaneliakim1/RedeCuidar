@@ -27,7 +27,6 @@ const Login = () => {
     setLoading(true);
     setError('');
     try {
-      // Transformar os parâmetros para form-url-encoded
       const formData = new URLSearchParams();
       formData.append('email', values.email);
       formData.append('senha', values.senha);
@@ -38,14 +37,19 @@ const Login = () => {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: formData.toString()
+        body: formData.toString(),
       });
 
+      const texto = await response.text(); // ✅ lê o corpo apenas uma vez
+
       if (response.ok) {
+        console.log('Login bem-sucedido:', texto);
+        localStorage.setItem('token', 'logado');
+        localStorage.setItem('nomeUsuario', values.email); // ou outro valor vindo do back
+        window.dispatchEvent(new Event('authChange'));
         navigate('/');
       } else {
-        const responseData = await response.text();
-        throw new Error(responseData || 'Credenciais inválidas');
+        throw new Error(texto || 'Credenciais inválidas');
       }
     } catch (error) {
       setError(error.message);
@@ -53,11 +57,6 @@ const Login = () => {
       setLoading(false);
     }
   };
-
-
-
-
-
 
 
   return (
@@ -113,7 +112,6 @@ const Login = () => {
               </Button>
             </Form>
           )}
-
         </Formik>
 
         <Box sx={{ mt: 2, textAlign: 'center' }}>
