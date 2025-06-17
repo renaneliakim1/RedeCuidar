@@ -7,15 +7,16 @@ import {
   Box,
   Link,
   Alert,
-  Container
+  Container,
+  CircularProgress
 } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import { login } from '../services/authService';
 
 const Login = () => {
   const navigate = useNavigate();
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const validationSchema = Yup.object().shape({
     email: Yup.string().email('Email inválido').required('Email é obrigatório'),
@@ -23,28 +24,51 @@ const Login = () => {
   });
 
   const handleSubmit = async (values) => {
+    setLoading(true);
+    setError('');
     try {
-      await login(values.email, values.senha);
-      navigate('/');
+      // Transformar os parâmetros para form-url-encoded
+      const formData = new URLSearchParams();
+      formData.append('email', values.email);
+      formData.append('senha', values.senha);
+
+      const response = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formData.toString()
+      });
+
+      if (response.ok) {
+        navigate('/');
+      } else {
+        const responseData = await response.text();
+        throw new Error(responseData || 'Credenciais inválidas');
+      }
     } catch (error) {
-      setError('Credenciais inválidas. Por favor, tente novamente.');
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
+
+
+
+
+
+
   return (
     <Container maxWidth="sm">
-      <Box sx={{
-        mt: 8,
-        p: 4,
-        boxShadow: 3,
-        borderRadius: 2
-      }}>
+      <Box sx={{ mt: 8, p: 4, boxShadow: 3, borderRadius: 2 }}>
         <Typography variant="h4" align="center" gutterBottom>
           Login
         </Typography>
 
         {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
+          <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError('')}>
             {error}
           </Alert>
         )}
@@ -83,11 +107,13 @@ const Login = () => {
                 fullWidth
                 size="large"
                 sx={{ mt: 3 }}
+                disabled={loading}
               >
-                Entrar
+                {loading ? <CircularProgress size={24} /> : 'Entrar'}
               </Button>
             </Form>
           )}
+
         </Formik>
 
         <Box sx={{ mt: 2, textAlign: 'center' }}>

@@ -16,8 +16,18 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    /*@Autowired
+    private PasswordEncoder passwordEncoder;*/
+
+    private final PasswordEncoder passwordEncoder;
+
+
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    public UsuarioService(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
+
 
     public Usuario criarUsuario(UsuarioDTO usuarioDTO) {
         Usuario usuario = usuarioDTO.toUsuario();

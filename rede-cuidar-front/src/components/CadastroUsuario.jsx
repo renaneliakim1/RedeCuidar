@@ -45,7 +45,7 @@ const validationSchema = Yup.object().shape({
   senha: Yup.string().min(6, 'Senha deve ter no mínimo 6 caracteres').required('Senha é obrigatória'),
   telefone: Yup.string().required('Telefone é obrigatório'),
   endereco: Yup.string().required('Endereço é obrigatório'),
-  ofereceServico: Yup.boolean().required(), // é um booleano
+   ofereceServico: Yup.boolean().default(false),
   especialidade: Yup.string().when('ofereceServico', {
     is: true,
     then: (schema) => schema.required('Especialidade é obrigatória para prestadores'),
@@ -63,25 +63,52 @@ const validationSchema = Yup.object().shape({
     const handleSubmit = async (values, { setSubmitting, resetForm  }) => {
       try {
         const usuarioData = {
-          ...values,
-          avaliacaoMedia: 0
+          nome: values.nome,
+          email: values.email,
+          senha: values.senha,
+          telefone: values.telefone,
+          endereco: values.endereco,
+          ofereceServico: values.ofereceServico,
+          especialidade: values.ofereceServico ? values.especialidade : null,
+          descricaoServico: values.ofereceServico ? values.descricaoServico : null
         };
-        console.log('Dados enviados:', usuarioData);
-         // Chama a API
-            await axios.post('http://localhost:8080/usuarios', usuarioData);
 
-         // Limpa o formulário
-            resetForm();
+        console.log('Dados enviados!', usuarioData);
+        // Chama o endpoint correto que é liberado pelo Spring
+        await axios.post('http://localhost:8080/api/auth/registro', usuarioData);
+        resetForm();
 
-        // await api.post('/usuarios', usuarioData);
-        navigate('/login');
+        navigate('/login'); // ou para onde quiser
       } catch (error) {
-        console.error('Erro no cadastro:', error);
+        console.error('Erro no cadastro!', error);
         setError(error.response?.data?.message || 'Erro ao cadastrar usuário');
       } finally {
         setSubmitting(false);
       }
     };
+
+
+
+const handleRegistro = async (values) => {
+  try {
+    const response = await fetch('http://localhost:8080/api/auth/registro', {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(values),
+    });
+
+    if (response.ok) {
+      console.log("Registro realizado!");
+      // redirecione para o login ou para a home
+    } else {
+      console.error("Registro não realizado.");
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+
 
 
 
