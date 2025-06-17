@@ -1,7 +1,22 @@
+import { useEffect, useState } from 'react';
 import { Box, Typography, Button, Container } from '@mui/material';
 import { Link } from 'react-router-dom';
 
 const Home = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const logado = localStorage.getItem('token') === 'logado';
+    setIsLoggedIn(logado);
+
+    // Atualiza estado se o login mudar
+    const handleAuthChange = () => {
+      setIsLoggedIn(localStorage.getItem('token') === 'logado');
+    };
+    window.addEventListener('authChange', handleAuthChange);
+    return () => window.removeEventListener('authChange', handleAuthChange);
+  }, []);
+
   return (
     <Container maxWidth="md">
       <Box sx={{ my: 4, textAlign: 'center' }}>
@@ -11,21 +26,23 @@ const Home = () => {
         <Typography variant="h5" paragraph>
           Conectando quem precisa de cuidados com quem pode oferecer
         </Typography>
+
         <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4 }}>
-          <Button
-            variant="contained"
-            size="large"
-            component={Link}
-            to="/cadastro"
-            sx={{
-              backgroundColor: '#1976d2',
-              '&:hover': { backgroundColor: '#1565c0' }
-            }}
-          >
-            Cadastre-se
-          </Button>
-
-
+          {/* Exibe o botão de cadastro apenas se NÃO estiver logado */}
+          {!isLoggedIn && (
+            <Button
+              variant="contained"
+              size="large"
+              component={Link}
+              to="/cadastro"
+              sx={{
+                backgroundColor: '#1976d2',
+                '&:hover': { backgroundColor: '#1565c0' }
+              }}
+            >
+              Cadastre-se
+            </Button>
+          )}
 
           <Button
             variant="outlined"
