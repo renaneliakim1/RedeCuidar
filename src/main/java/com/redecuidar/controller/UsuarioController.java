@@ -6,15 +6,19 @@ import com.redecuidar.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/usuarios")
+@RequestMapping("/usuarios")
+@CrossOrigin(origins = "http://localhost:5173")//@CrossOrigin(originPatterns = "http://localhost:5173") ou "
 public class UsuarioController {
 
+    private final UsuarioService usuarioService;
+
     @Autowired
-    private UsuarioService usuarioService;
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
 
     @PostMapping
     public ResponseEntity<Usuario> criarUsuario(@RequestBody UsuarioDTO usuarioDTO) {
@@ -37,8 +41,8 @@ public class UsuarioController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Usuario> atualizarUsuario(@PathVariable Long id, @RequestBody UsuarioDTO usuarioDTO) {
-        Usuario usuario = usuarioService.atualizarUsuario(id, usuarioDTO);
-        return ResponseEntity.ok(usuario);
+        Usuario atualizado = usuarioService.atualizarUsuario(id, usuarioDTO);
+        return ResponseEntity.ok(atualizado);
     }
 
     @DeleteMapping("/{id}")
@@ -48,15 +52,15 @@ public class UsuarioController {
     }
 
     @GetMapping("/prestadores")
-    public ResponseEntity<List<Usuario>> listarPrestadores() {
+    public ResponseEntity<List<Usuario>> listarPrestadoresServico() {
         List<Usuario> prestadores = usuarioService.listarPrestadoresServico();
         return ResponseEntity.ok(prestadores);
     }
 
     @GetMapping("/prestadores/{especialidade}")
-    public ResponseEntity<List<Usuario>> listarPrestadoresPorEspecialidade(
-            @PathVariable Usuario.Especialidade especialidade) {
+    public ResponseEntity<List<Usuario>> listarPrestadoresPorEspecialidade(@PathVariable Usuario.Especialidade especialidade) {
         List<Usuario> prestadores = usuarioService.listarPrestadoresPorEspecialidade(especialidade);
         return ResponseEntity.ok(prestadores);
     }
 }
+

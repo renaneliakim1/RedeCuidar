@@ -16,6 +16,8 @@ import {
   Box,
   Alert
 } from '@mui/material';
+import axios from 'axios';
+
 
 const CadastroUsuario = () => {
    const navigate = useNavigate();
@@ -43,28 +45,34 @@ const validationSchema = Yup.object().shape({
   senha: Yup.string().min(6, 'Senha deve ter no mínimo 6 caracteres').required('Senha é obrigatória'),
   telefone: Yup.string().required('Telefone é obrigatório'),
   endereco: Yup.string().required('Endereço é obrigatório'),
-
-  // Validação condicional CORRETA:
-  especialidade: Yup.string()
-    .when('ofereceServico', {
-      is: true, // ou (value) => value === true
-      then: Yup.string().required('Especialidade é obrigatória para prestadores'),
-    }),
-
-  descricaoServico: Yup.string()
-    .when('ofereceServico', {
-      is: true,
-      then: Yup.string().required('Descrição do serviço é obrigatória'),
-    })
+  ofereceServico: Yup.boolean().required(), // é um booleano
+  especialidade: Yup.string().when('ofereceServico', {
+    is: true,
+    then: (schema) => schema.required('Especialidade é obrigatória para prestadores'),
+    otherwise: (schema) => schema.notRequired()
+  }),
+  descricaoServico: Yup.string().when('ofereceServico', {
+    is: true,
+    then: (schema) => schema.required('Descrição do serviço é obrigatória'),
+    otherwise: (schema) => schema.notRequired()
+  })
 });
 
-    const handleSubmit = async (values, { setSubmitting }) => {
+
+
+    const handleSubmit = async (values, { setSubmitting, resetForm  }) => {
       try {
         const usuarioData = {
           ...values,
           avaliacaoMedia: 0
         };
         console.log('Dados enviados:', usuarioData);
+         // Chama a API
+            await axios.post('http://localhost:8080/usuarios', usuarioData);
+
+         // Limpa o formulário
+            resetForm();
+
         // await api.post('/usuarios', usuarioData);
         navigate('/login');
       } catch (error) {
@@ -170,16 +178,19 @@ const validationSchema = Yup.object().shape({
 
 
               {/* Oferece Serviço */}
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    name="ofereceServico"
-                    checked={values.ofereceServico}
-                    onChange={handleChange}  // Certifique-se que está usando o handleChange do Formik
-                  />
-                }
-                label="Ofereço serviços de cuidado"
-              />
+             <FormControlLabel
+               control={
+                 <Checkbox
+                   name="ofereceServico"
+                   checked={values.ofereceServico}
+                   onChange={(e) => {
+                     handleChange(e);
+                   }}
+                 />
+               }
+               label="Ofereço serviços de cuidado"
+             />
+
 
               {/* Campos condicionais para prestadores de serviço */}
               {values.ofereceServico && (
