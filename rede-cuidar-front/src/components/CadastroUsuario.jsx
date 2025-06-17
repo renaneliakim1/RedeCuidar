@@ -271,3 +271,5 @@ const handleRegistro = async (values) => {
 };
 
 export default CadastroUsuario;
+
+
