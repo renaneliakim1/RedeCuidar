@@ -81,6 +81,12 @@ public class UsuarioController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/oferecendo-servicos")
+    public List<Usuario> listarQuemOfereceServicos() {
+        return usuarioRepository.findByOfereceServicoTrue();
+    }
+
+
 
 
 

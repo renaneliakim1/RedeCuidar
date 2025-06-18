@@ -1,111 +1,99 @@
 import { useState, useEffect } from 'react';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Button,
-  Typography,
-  Box,
-  Chip
+  Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper, Typography,
+  Button, Container, Box
 } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { getServicos } from '../services/servicoService';
+import axios from 'axios';
+
 
 const ListaServicos = () => {
-  const [servicos, setServicos] = useState([]);
-  const [mostrarDisponiveis, setMostrarDisponiveis] = useState(false);
+  const [usuarios, setUsuarios] = useState([]);
 
   useEffect(() => {
-     const fetchServicos = async () => {
-       try {
-         const data = await getServicosDisponiveis();
-         setServicos(data);
-       } catch (error) {
-         console.error('Erro ao carregar serviços:', error);
-       }
-     };
+    const fetchUsuarios = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/usuarios/oferecendo-servicos");
+        setUsuarios(response.data);
+      } catch (error) {
+        console.error("Erro ao buscar usuários com serviços:", error);
+      }
+    };
 
-    fetchServicos();
-     }, []);
+    fetchUsuarios();
+  }, []);
 
+  const abrirWhatsapp = (telefone) => {
+    const numero = telefone.replace(/\D/g, '');
+    window.open(`https://wa.me/55${numero}`, '_blank');
+  };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        {mostrarDisponiveis ? 'Serviços Disponíveis' : 'Todos os Serviços'}
+    <Container sx={{ mt: 4 }}>
+      <Typography variant="h4" align="center" sx={{ mb: 3 }}>
+        Profissionais disponíveis
       </Typography>
-
-      <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-        <Button
-          variant="contained"
-          onClick={() => setMostrarDisponiveis(!mostrarDisponiveis)}
-        >
-          {mostrarDisponiveis ? 'Mostrar Todos' : 'Mostrar Apenas Disponíveis'}
-        </Button>
-        <Button
-          variant="outlined"
-          component={Link}
-          to="/servicos/novo"
-        >
-          Novo Serviço
-        </Button>
-      </Box>
 
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Título</TableCell>
-              <TableCell>Categoria</TableCell>
-              <TableCell>Prestador</TableCell>
-              <TableCell>Preço</TableCell>
-              <TableCell>Status</TableCell>
+              <TableCell>Nome</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Telefone</TableCell>
+              <TableCell>Endereço</TableCell>
+              <TableCell>Especialidade</TableCell>
+              <TableCell>Descrição</TableCell>
               <TableCell>Ações</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {servicos.map((servico) => (
-              <TableRow key={servico.id}>
-                <TableCell>{servico.titulo}</TableCell>
+            {usuarios.map((usuario) => (
+              <TableRow key={usuario.id}>
+                <TableCell>{usuario.nome}</TableCell>
+                <TableCell>{usuario.email}</TableCell>
+                <TableCell>{usuario.telefone}</TableCell>
+                <TableCell>{usuario.endereco}</TableCell>
+                <TableCell>{usuario.especialidade}</TableCell>
+                <TableCell>{usuario.descricaoServico || 'Sem descrição'}</TableCell>
                 <TableCell>
-                  <Chip
-                    label={servico.categoria.replace(/_/g, ' ')}
-                    color="primary"
-                    size="small"
-                  />
+                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      sx={{
+                        mb: 1, // margem inferior para espaçar do próximo botão
+                        backgroundColor: '#25D366',
+                        color: 'white',
+                        '&:hover': { backgroundColor: '#1ebe57' }
+                      }}
+                      onClick={() => abrirWhatsapp(usuario.telefone)}
+                    >
+                      WhatsApp
+                    </Button>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      sx={{
+                        backgroundColor: '#1976d2',
+                        color: 'white',
+                        '&:hover': { backgroundColor: '#155a9c' }
+                      }}
+                      component={Link}
+                      to={`/perfil/${usuario.id}`}
+                    >
+                      Ver Perfil
+                    </Button>
+                  </Box>
                 </TableCell>
-                <TableCell>{servico.prestador.nome}</TableCell>
-                <TableCell>
-                  {servico.preco.toLocaleString('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL'
-                  })}
-                </TableCell>
-                <TableCell>
-                  <Chip
-                    label={servico.disponivel ? 'Disponível' : 'Indisponível'}
-                    color={servico.disponivel ? 'success' : 'error'}
-                  />
-                </TableCell>
-                <TableCell>
-                  <Button
-                    component={Link}
-                    to={`/servicos/${servico.id}`}
-                    size="small"
-                  >
-                    Detalhes
-                  </Button>
-                </TableCell>
+
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-    </Box>
+    </Container>
   );
 };
 
