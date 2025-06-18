@@ -15,7 +15,10 @@ const Perfil = () => {
 
     axios.get(`http://localhost:8080/usuarios/perfil?email=${encodeURIComponent(email)}`)
       .then(response => {
+
+
         setUsuario(response.data);
+        console.log(response.data);  // para ver os dados recebidos
       })
       .catch(error => {
         console.error("Erro ao buscar perfil:", error);
@@ -32,7 +35,7 @@ const Perfil = () => {
   }
 
   // Desestruturação para facilitar o uso
-  const { nome, email, telefone, ofereceServicos, especialidade } = usuario;
+  const { nome, email, telefone, ofereceServico, especialidade,descricaoServico,endereco  } = usuario;
 
   return (
     <div style={{ padding: '2rem' }}>
@@ -40,8 +43,13 @@ const Perfil = () => {
       <p><strong>Nome:</strong> {nome}</p>
       <p><strong>Email:</strong> {email}</p>
       <p><strong>Telefone:</strong> {telefone}</p>
-      {ofereceServicos && (
-        <p><strong>Especialidade:</strong> {especialidade}</p>
+      <p><strong>Endereço:</strong> {endereco}</p>
+
+      {ofereceServico && (
+         <>
+          <p><strong>Especialidade:</strong> {especialidade}</p>
+          <p><strong>Descrição do Serviço:</strong> {descricaoServico || "Sem descrição"}</p>
+        </>
       )}
     </div>
   );
