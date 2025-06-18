@@ -15,7 +15,9 @@ const Perfil = () => {
       return;
     }
 
-    axios.get(`http://localhost:8080/usuarios/perfil?email=${encodeURIComponent(email)}`)
+    axios.get(`http://localhost:8080/usuarios/perfil?email=${encodeURIComponent(email)}`, {
+      withCredentials: true
+    })
       .then(response => {
         setUsuario(response.data);
         setFormData(response.data); // já preenche o formulário
@@ -26,6 +28,7 @@ const Perfil = () => {
         setErro("Erro ao carregar perfil.");
       });
   }, []);
+
 
   const handleSalvar = (e) => {
     e.preventDefault();
