@@ -13,6 +13,8 @@ import EditarServico from './components/EditarServico';
 import DetalheServico from './components/DetalheServico';
 import Login from './components/Login';
 import PrivateRoute from './components/PrivateRoute';
+import Perfil from './components/Perfil';
+
 
 const theme = createTheme({
   palette: {
@@ -42,6 +44,7 @@ function App() {
             {/* Rotas públicas */}
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/perfil" element={<Perfil />} />
             <Route path="/cadastro" element={<CadastroUsuario />} />
             <Route path="/servicos" element={<ListaServicos />} />
 

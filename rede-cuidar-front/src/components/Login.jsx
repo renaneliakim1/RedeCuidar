@@ -45,7 +45,7 @@ const Login = () => {
       if (response.ok) {
         console.log('Login bem-sucedido:', texto);
         localStorage.setItem('token', 'logado');
-        localStorage.setItem('nomeUsuario', values.email); // ou outro valor vindo do back
+        localStorage.setItem('email', values.email); // ou outro valor vindo do back
         window.dispatchEvent(new Event('authChange'));
         navigate('/');
       } else {

@@ -2,22 +2,26 @@ package com.redecuidar.controller;
 
 import com.redecuidar.dto.UsuarioDTO;
 import com.redecuidar.model.Usuario;
+import com.redecuidar.repository.UsuarioRepository;
 import com.redecuidar.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/usuarios")
-@CrossOrigin(origins = "http://localhost:5173")//@CrossOrigin(originPatterns = "http://localhost:5173") ou "
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")//@CrossOrigin(originPatterns = "http://localhost:5173") ou "
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
+    private UsuarioRepository usuarioRepository;
 
     @Autowired
-    public UsuarioController(UsuarioService usuarioService) {
+    public UsuarioController(UsuarioService usuarioService, UsuarioRepository usuarioRepository) {
         this.usuarioService = usuarioService;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @PostMapping
@@ -62,5 +66,23 @@ public class UsuarioController {
         List<Usuario> prestadores = usuarioService.listarPrestadoresPorEspecialidade(especialidade);
         return ResponseEntity.ok(prestadores);
     }
+
+
+    /*@GetMapping("/email/{email}")
+    public ResponseEntity<Usuario> buscarPorEmail(@PathVariable String email) {
+        Optional<Usuario> usuario = usuarioRepository.findByEmail(email);
+        return usuario.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }*/
+
+    @GetMapping("/perfil")
+    public ResponseEntity<Usuario> buscarPorEmail(@RequestParam String email) {
+        return usuarioRepository.findByEmail(email)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+
+
+
 }
 

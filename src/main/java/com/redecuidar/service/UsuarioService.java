@@ -65,4 +65,11 @@ public class UsuarioService {
     public List<Usuario> listarPrestadoresPorEspecialidade(Usuario.Especialidade especialidade) {
         return usuarioRepository.findByOfereceServicoTrueAndEspecialidade(especialidade);
     }
+
+    public Usuario buscarPorEmail(String email) {
+        return usuarioRepository.findByEmail(email).orElse(null);
+    }
+
+
+
 }
