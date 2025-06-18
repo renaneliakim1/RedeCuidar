@@ -37,6 +37,7 @@ const Perfil = () => {
   // Desestruturação para facilitar o uso
   const { nome, email, telefone, ofereceServico, especialidade,descricaoServico,endereco  } = usuario;
 
+
   return (
     <div style={{ padding: '2rem' }}>
       <h2>Perfil do Usuário</h2>
