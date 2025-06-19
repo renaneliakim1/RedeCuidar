@@ -16,6 +16,7 @@ import PrivateRoute from './components/PrivateRoute';
 import Perfil from './components/Perfil';
 
 
+
 const theme = createTheme({
   palette: {
     primary: {
@@ -47,6 +48,8 @@ function App() {
             <Route path="/perfil" element={<Perfil />} />
             <Route path="/cadastro" element={<CadastroUsuario />} />
             <Route path="/servicos" element={<ListaServicos />} />
+            <Route path="/perfil/:id" element={<PerfilUsuario />} />
+
 
             {/* Rotas protegidas - Usuários */}
             <Route path="/usuarios" element={
