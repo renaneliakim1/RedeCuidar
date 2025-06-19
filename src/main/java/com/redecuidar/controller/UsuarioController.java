@@ -43,11 +43,35 @@ public class UsuarioController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/{id}")
+/*    @PutMapping("/{id}")
     public ResponseEntity<Usuario> atualizarUsuario(@PathVariable Long id, @RequestBody UsuarioDTO usuarioDTO) {
         Usuario atualizado = usuarioService.atualizarUsuario(id, usuarioDTO);
         return ResponseEntity.ok(atualizado);
+    }*/
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Usuario> atualizarUsuario(
+            @PathVariable Long id,
+            @RequestBody Usuario usuarioAtualizado) {
+
+        return usuarioRepository.findById(id)
+                .map(usuario -> {
+                    // Atualize os campos que quiser, exemplo:
+                    usuario.setNome(usuarioAtualizado.getNome());
+                    usuario.setEmail(usuarioAtualizado.getEmail());
+                    usuario.setTelefone(usuarioAtualizado.getTelefone());
+                    usuario.setEndereco(usuarioAtualizado.getEndereco());
+                    usuario.setEspecialidade(usuarioAtualizado.getEspecialidade());
+                    usuario.setDescricaoServico(usuarioAtualizado.getDescricaoServico());
+                    usuario.setOfereceServico(usuarioAtualizado.isOfereceServico());
+                    // lembre-se de atualizar a senha só se quiser (ou ignore)
+
+                    Usuario atualizado = usuarioRepository.save(usuario);
+                    return ResponseEntity.ok(atualizado);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarUsuario(@PathVariable Long id) {
