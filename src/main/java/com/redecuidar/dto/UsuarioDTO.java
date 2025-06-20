@@ -25,6 +25,8 @@ public class UsuarioDTO {
     @NotBlank(message = "Endereço é obrigatório")
     private String endereco;
 
+    private String fotoPerfil;
+
     private boolean ofereceServico;
 
     private Usuario.Especialidade especialidade;
@@ -42,6 +44,8 @@ public class UsuarioDTO {
         usuario.setOfereceServico(this.ofereceServico);
         usuario.setEspecialidade(this.especialidade);
         usuario.setDescricaoServico(this.descricaoServico);
+        usuario.setFotoPerfil(this.fotoPerfil);
+
         return usuario;
     }
 }

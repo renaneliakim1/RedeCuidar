@@ -6,9 +6,16 @@ import com.redecuidar.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UsuarioService {
@@ -16,18 +23,12 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    /*@Autowired
-    private PasswordEncoder passwordEncoder;*/
-
     private final PasswordEncoder passwordEncoder;
-
 
     @Autowired
     public UsuarioService(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
     }
-
-
 
     public Usuario criarUsuario(UsuarioDTO usuarioDTO) {
         Usuario usuario = usuarioDTO.toUsuario();
@@ -70,6 +71,23 @@ public class UsuarioService {
         return usuarioRepository.findByEmail(email).orElse(null);
     }
 
+    public Usuario criarUsuarioComFoto(UsuarioDTO usuarioDTO, MultipartFile foto) {
+        Usuario usuario = usuarioDTO.toUsuario();
+        usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
 
+        if (foto != null && !foto.isEmpty()) {
+            try {
+                String nomeArquivo = UUID.randomUUID() + "_" + foto.getOriginalFilename();
+                Path caminho = Paths.get("uploads/fotos-perfil", nomeArquivo);
+                Files.createDirectories(caminho.getParent());
+                Files.copy(foto.getInputStream(), caminho, StandardCopyOption.REPLACE_EXISTING);
+                usuario.setFotoPerfil(nomeArquivo);
+            } catch (IOException e) {
+                throw new RuntimeException("Erro ao salvar a foto de perfil", e);
+            }
+        }
+
+        return usuarioRepository.save(usuario);
+    }
 
 }

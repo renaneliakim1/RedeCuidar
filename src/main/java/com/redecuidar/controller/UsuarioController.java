@@ -5,8 +5,12 @@ import com.redecuidar.model.Usuario;
 import com.redecuidar.repository.UsuarioRepository;
 import com.redecuidar.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -24,11 +28,15 @@ public class UsuarioController {
         this.usuarioRepository = usuarioRepository;
     }
 
-    @PostMapping
-    public ResponseEntity<Usuario> criarUsuario(@RequestBody UsuarioDTO usuarioDTO) {
-        Usuario usuario = usuarioService.criarUsuario(usuarioDTO);
-        return ResponseEntity.ok(usuario);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Usuario> criarUsuario(
+            @RequestPart("usuario") UsuarioDTO usuarioDTO,
+            @RequestPart(value = "foto", required = false) MultipartFile foto) {
+
+        Usuario usuario = usuarioService.criarUsuarioComFoto(usuarioDTO, foto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuario);
     }
+
 
     @GetMapping
     public ResponseEntity<List<Usuario>> listarUsuarios() {
@@ -42,12 +50,6 @@ public class UsuarioController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-
-/*    @PutMapping("/{id}")
-    public ResponseEntity<Usuario> atualizarUsuario(@PathVariable Long id, @RequestBody UsuarioDTO usuarioDTO) {
-        Usuario atualizado = usuarioService.atualizarUsuario(id, usuarioDTO);
-        return ResponseEntity.ok(atualizado);
-    }*/
 
     @PutMapping("/{id}")
     public ResponseEntity<Usuario> atualizarUsuario(
@@ -72,7 +74,6 @@ public class UsuarioController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarUsuario(@PathVariable Long id) {
         usuarioService.deletarUsuario(id);
@@ -91,13 +92,6 @@ public class UsuarioController {
         return ResponseEntity.ok(prestadores);
     }
 
-
-    /*@GetMapping("/email/{email}")
-    public ResponseEntity<Usuario> buscarPorEmail(@PathVariable String email) {
-        Optional<Usuario> usuario = usuarioRepository.findByEmail(email);
-        return usuario.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-    }*/
-
     @GetMapping("/perfil")
     public ResponseEntity<Usuario> buscarPorEmail(@RequestParam String email) {
         return usuarioRepository.findByEmail(email)
@@ -109,10 +103,6 @@ public class UsuarioController {
     public List<Usuario> listarQuemOfereceServicos() {
         return usuarioRepository.findByOfereceServicoTrue();
     }
-
-
-
-
 
 }
 

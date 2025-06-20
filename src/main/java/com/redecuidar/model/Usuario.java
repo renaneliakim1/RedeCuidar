@@ -34,6 +34,8 @@ public class Usuario {
 
     private boolean ofereceServico;
 
+    private String fotoPerfil;
+
     @Enumerated(EnumType.STRING)
     private Especialidade especialidade;
 

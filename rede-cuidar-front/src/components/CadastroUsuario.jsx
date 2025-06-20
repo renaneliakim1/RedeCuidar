@@ -58,33 +58,45 @@ const validationSchema = Yup.object().shape({
   })
 });
 
-    const handleSubmit = async (values, { setSubmitting, resetForm  }) => {
-      try {
+const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+  try {
+    const formData = new FormData();
 
-        const usuarioData = {
-          nome: values.nome,
-          email: values.email,
-          senha: values.senha,
-          telefone: values.telefone,
-          endereco: values.endereco,
-          ofereceServico: values.ofereceServico,
-          especialidade: values.ofereceServico ? values.especialidade : null,
-          descricaoServico: values.ofereceServico ? values.descricaoServico : null
-        };
-
-        console.log('Dados enviados!', usuarioData);
-        // Chama o endpoint correto que é liberado pelo Spring
-        await axios.post('http://localhost:8080/api/auth/registro', usuarioData);
-        resetForm();
-
-        navigate('/login'); // ou para onde quiser
-      } catch (error) {
-        console.error('Erro no cadastro!', error);
-        setError(error.response?.data?.message || 'Erro ao cadastrar usuário');
-      } finally {
-        setSubmitting(false);
-      }
+    const usuarioData = {
+      nome: values.nome,
+      email: values.email,
+      senha: values.senha,
+      telefone: values.telefone,
+      endereco: values.endereco,
+      ofereceServico: values.ofereceServico,
+      especialidade: values.ofereceServico ? values.especialidade : null,
+      descricaoServico: values.ofereceServico ? values.descricaoServico : null
     };
+
+    // Anexa os dados do usuário em formato JSON
+    formData.append("usuario", new Blob([JSON.stringify(usuarioData)], { type: "application/json" }));
+
+    // Anexa a imagem, se houver
+    if (values.fotoPerfil) {
+      formData.append("foto", values.fotoPerfil);
+    }
+
+    await axios.post("http://localhost:8080/usuarios", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    resetForm();
+    navigate("/login");
+  } catch (error) {
+    console.error("Erro no cadastro!", error);
+    setError(error.response?.data?.message || "Erro ao cadastrar usuário");
+  } finally {
+    setSubmitting(false);
+  }
+};
+
 
 
 
@@ -201,6 +213,20 @@ const handleRegistro = async (values) => {
                 error={touched.endereco && !!errors.endereco}
                 helperText={touched.endereco && errors.endereco}
               />
+
+              <input
+                type="file"
+                name="fotoPerfil"
+                accept="image/*"
+                onChange={(event) => {
+                  const file = event.currentTarget.files[0];
+                  if (file) {
+                    // Formik não manipula arquivos diretamente, mas você pode salvar via setFieldValue
+                    values.fotoPerfil = file;
+                  }
+                }}
+              />
+
 
 
               {/* Oferece Serviço */}

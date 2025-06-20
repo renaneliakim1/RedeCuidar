@@ -33,6 +33,16 @@ const PerfilUsuario = () => {
     <Container sx={{ mt: 4 }}>
       <Typography variant="h4" gutterBottom>Perfil do Usuário</Typography>
 
+      {usuario.fotoPerfil && (
+        <img
+          src={`http://localhost:8080/uploads/fotos-perfil/${usuario.fotoPerfil}`}
+          alt="Foto de perfil"
+          style={{ width: '150px', height: '150px', borderRadius: '50%', objectFit: 'cover', marginBottom: '1rem' }}
+        />
+      )}
+
+
+
       <Box sx={{ mb: 2 }}>
         <Typography><strong>Nome:</strong> {usuario.nome}</Typography>
         <Typography><strong>Email:</strong> {usuario.email}</Typography>

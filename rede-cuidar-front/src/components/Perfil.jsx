@@ -84,6 +84,15 @@ const Perfil = () => {
 
   return (
     <div style={{ padding: '2rem' }}>
+        {usuario.fotoPerfil && (
+          <img
+            src={`http://localhost:8080/uploads/fotos-perfil/${usuario.fotoPerfil}`}
+            alt="Foto de perfil"
+            style={{ width: '150px', height: '150px', borderRadius: '50%', objectFit: 'cover', marginBottom: '1rem' }}
+          />
+        )}
+
+
       <h2>Perfil do Usuário</h2>
 
       {editando ? (
