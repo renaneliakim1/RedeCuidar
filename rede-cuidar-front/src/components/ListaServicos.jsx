@@ -2,11 +2,10 @@ import { useState, useEffect } from 'react';
 import {
   Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper, Typography,
-  Button, Container, Box
+  Button, Container, Box, Avatar
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-
 
 const ListaServicos = () => {
   const [usuarios, setUsuarios] = useState([]);
@@ -51,7 +50,15 @@ const ListaServicos = () => {
           <TableBody>
             {usuarios.map((usuario) => (
               <TableRow key={usuario.id}>
-                <TableCell>{usuario.nome}</TableCell>
+                <TableCell>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Avatar
+                      alt={usuario.nome}
+                      src={usuario.fotoPerfil ? `http://localhost:8080/uploads/fotos-perfil/${usuario.fotoPerfil}` : ''}
+                    />
+                    {usuario.nome}
+                  </Box>
+                </TableCell>
                 <TableCell>{usuario.email}</TableCell>
                 <TableCell>{usuario.telefone}</TableCell>
                 <TableCell>{usuario.endereco}</TableCell>
@@ -63,7 +70,7 @@ const ListaServicos = () => {
                       size="small"
                       variant="contained"
                       sx={{
-                        mb: 1, // margem inferior para espaçar do próximo botão
+                        mb: 1,
                         backgroundColor: '#25D366',
                         color: 'white',
                         '&:hover': { backgroundColor: '#1ebe57' }
@@ -87,7 +94,6 @@ const ListaServicos = () => {
                     </Button>
                   </Box>
                 </TableCell>
-
               </TableRow>
             ))}
           </TableBody>
