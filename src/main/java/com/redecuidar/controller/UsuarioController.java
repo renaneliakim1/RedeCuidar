@@ -12,15 +12,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/usuarios")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")//@CrossOrigin(originPatterns = "http://localhost:5173") ou "
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
-    private UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
 
     @Autowired
     public UsuarioController(UsuarioService usuarioService, UsuarioRepository usuarioRepository) {
@@ -37,7 +36,6 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuario);
     }
 
-
     @GetMapping
     public ResponseEntity<List<Usuario>> listarUsuarios() {
         List<Usuario> usuarios = usuarioService.listarTodosUsuarios();
@@ -51,27 +49,18 @@ public class UsuarioController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Usuario> atualizarUsuario(
             @PathVariable Long id,
-            @RequestBody Usuario usuarioAtualizado) {
+            @RequestPart("usuario") UsuarioDTO usuarioDTO,
+            @RequestPart(value = "foto", required = false) MultipartFile foto) {
 
-        return usuarioRepository.findById(id)
-                .map(usuario -> {
-                    // Atualize os campos que quiser, exemplo:
-                    usuario.setNome(usuarioAtualizado.getNome());
-                    usuario.setEmail(usuarioAtualizado.getEmail());
-                    usuario.setTelefone(usuarioAtualizado.getTelefone());
-                    usuario.setEndereco(usuarioAtualizado.getEndereco());
-                    usuario.setEspecialidade(usuarioAtualizado.getEspecialidade());
-                    usuario.setDescricaoServico(usuarioAtualizado.getDescricaoServico());
-                    usuario.setOfereceServico(usuarioAtualizado.isOfereceServico());
-                    // lembre-se de atualizar a senha só se quiser (ou ignore)
-
-                    Usuario atualizado = usuarioRepository.save(usuario);
-                    return ResponseEntity.ok(atualizado);
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        try {
+            Usuario usuarioAtualizado = usuarioService.atualizarUsuarioComFoto(id, usuarioDTO, foto);
+            return ResponseEntity.ok(usuarioAtualizado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @DeleteMapping("/{id}")
@@ -103,6 +92,4 @@ public class UsuarioController {
     public List<Usuario> listarQuemOfereceServicos() {
         return usuarioRepository.findByOfereceServicoTrue();
     }
-
 }
-

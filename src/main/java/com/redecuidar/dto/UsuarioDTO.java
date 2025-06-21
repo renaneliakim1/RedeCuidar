@@ -27,7 +27,7 @@ public class UsuarioDTO {
 
     private String fotoPerfil;
 
-    private boolean ofereceServico;
+    private Boolean ofereceServico;
 
     private Usuario.Especialidade especialidade;
 

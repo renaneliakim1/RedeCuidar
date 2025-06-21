@@ -19,6 +19,10 @@ const Perfil = () => {
   const [editando, setEditando] = useState(false);
   const [formData, setFormData] = useState({});
 
+  const [novaFoto, setNovaFoto] = useState(null);
+  const [previewFoto, setPreviewFoto] = useState(null);
+
+
   useEffect(() => {
     const email = localStorage.getItem("email");
 
@@ -43,19 +47,32 @@ const Perfil = () => {
   const handleSalvar = (e) => {
     e.preventDefault();
 
-    axios.put(`http://localhost:8080/usuarios/${usuario.id}`, formData, {
+    const dadosUsuario = { ...formData };
+    delete dadosUsuario.fotoPerfil;
+
+    const data = new FormData();
+    data.append('usuario', new Blob([JSON.stringify(dadosUsuario)], { type: 'application/json' }));
+    if (novaFoto) {
+      data.append('foto', novaFoto);
+    }
+
+    axios.put(`http://localhost:8080/usuarios/${usuario.id}`, data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
       withCredentials: true
     })
       .then(response => {
         alert("Dados atualizados com sucesso!");
         setUsuario(response.data);
         setEditando(false);
+        setNovaFoto(null);
+        setPreviewFoto(null);
       })
       .catch(error => {
         console.error("Erro ao atualizar perfil:", error);
         alert("Erro ao salvar alterações.");
       });
   };
+
 
   const handleExcluir = () => {
     if (!window.confirm("Tem certeza que deseja excluir seu perfil? Essa ação não pode ser desfeita.")) return;
@@ -84,13 +101,45 @@ const Perfil = () => {
 
   return (
     <div style={{ padding: '2rem' }}>
-        {usuario.fotoPerfil && (
-          <img
-            src={`http://localhost:8080/uploads/fotos-perfil/${usuario.fotoPerfil}`}
-            alt="Foto de perfil"
-            style={{ width: '150px', height: '150px', borderRadius: '50%', objectFit: 'cover', marginBottom: '1rem' }}
-          />
+        <img
+          src={
+            previewFoto
+              ? previewFoto
+              : usuario.fotoPerfil
+              ? `http://localhost:8080/uploads/fotos-perfil/${usuario.fotoPerfil}`
+              : ''
+          }
+          alt="Foto de perfil"
+          style={{
+            width: '150px',
+            height: '150px',
+            borderRadius: '50%',
+            objectFit: 'cover',
+            marginBottom: '1rem'
+          }}
+        />
+
+        {editando && (
+          <div style={{ marginBottom: '1rem', color: 'blue'  }}>
+            <label style={{ cursor: 'pointer' }}>
+              <strong>Alterar Foto</strong>
+              <input
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    setNovaFoto(file);
+                    setPreviewFoto(URL.createObjectURL(file));
+                  }
+                }}
+              />
+            </label>
+          </div>
         )}
+
+
 
 
       <h2>Perfil do Usuário</h2>

@@ -13,14 +13,12 @@ import {
   FormControl,
   Grid,
   CircularProgress,
-  Alert
+  Alert,
+  Avatar
 } from '@mui/material';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-/*import { getUsuario, updateUsuario } from '../services/usuarioService';*/
- import { getUsuario, updateUsuario } from '../services/usuarioService';
-
-
+import { getUsuario, updateUsuario } from '../services/usuarioService';
 
 const EditarUsuario = () => {
   const { id } = useParams();
@@ -28,6 +26,7 @@ const EditarUsuario = () => {
   const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [preview, setPreview] = useState(null);
 
   const gruposOptions = [
     { value: 'MULHER', label: 'Mulher' },
@@ -66,25 +65,53 @@ const EditarUsuario = () => {
   });
 
   useEffect(() => {
-      const fetchUsuario = async () => {
-        try {
-          const data = await getUsuario(id);
-          setUsuario(data);
-        } catch (error) {
-          console.error('Erro ao carregar usuário:', error);
+    const fetchUsuario = async () => {
+      try {
+        const data = await getUsuario(id);
+        setUsuario(data);
+        if (data.fotoPerfil) {
+          setPreview(`http://localhost:8080/uploads/fotos-perfil/${data.fotoPerfil}`);
         }
-      };
-
-      fetchUsuario();
+      } catch (error) {
+        console.error('Erro ao carregar usuário:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUsuario();
   }, [id]);
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      await updateUsuario(id, values);
+      const formData = new FormData();
+
+      // Dados JSON do usuário (exceto a foto)
+      const usuarioData = {
+        nome: values.nome,
+        email: values.email,
+        telefone: values.telefone,
+        endereco: values.endereco,
+        ofereceServico: values.ofereceServico,
+        especialidade: values.ofereceServico ? values.especialidade : null,
+        descricaoServico: values.ofereceServico ? values.descricaoServico : null,
+        gruposVulneraveis: values.gruposVulneraveis || [],
+      };
+
+      formData.append('usuario', new Blob([JSON.stringify(usuarioData)], { type: 'application/json' }));
+
+      // Se o usuário escolheu nova foto, anexa ao formData
+      if (values.fotoPerfil instanceof File) {
+        formData.append('foto', values.fotoPerfil);
+      }
+
+      await updateUsuario(id, formData);
+
       navigate('/usuarios');
     } catch (err) {
       setError('Erro ao atualizar usuário');
       console.error(err);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -106,7 +133,9 @@ const EditarUsuario = () => {
 
   return (
     <Box sx={{ maxWidth: 800, margin: 'auto', p: 3 }}>
-      <Typography variant="h4" gutterBottom>Editar Usuário</Typography>
+      <Typography variant="h4" gutterBottom>
+        Editar Usuário
+      </Typography>
 
       {error && (
         <Alert severity="error" sx={{ mb: 3 }}>
@@ -123,14 +152,16 @@ const EditarUsuario = () => {
           ofereceServico: usuario.ofereceServico,
           especialidade: usuario.especialidade || '',
           descricaoServico: usuario.descricaoServico || '',
-          gruposVulneraveis: usuario.gruposVulneraveis || []
+          gruposVulneraveis: usuario.gruposVulneraveis || [],
+          fotoPerfil: null,
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ values, errors, touched }) => (
+        {({ values, errors, touched, setFieldValue }) => (
           <Form>
             <Grid container spacing={2}>
+              {/* Campos textuais */}
               <Grid item xs={12}>
                 <Field
                   as={TextField}
@@ -141,6 +172,7 @@ const EditarUsuario = () => {
                   helperText={touched.nome && errors.nome}
                 />
               </Grid>
+
               <Grid item xs={12} sm={6}>
                 <Field
                   as={TextField}
@@ -148,10 +180,12 @@ const EditarUsuario = () => {
                   label="Email"
                   type="email"
                   fullWidth
+                  disabled
                   error={touched.email && !!errors.email}
                   helperText={touched.email && errors.email}
                 />
               </Grid>
+
               <Grid item xs={12} sm={6}>
                 <Field
                   as={TextField}
@@ -162,6 +196,7 @@ const EditarUsuario = () => {
                   helperText={touched.telefone && errors.telefone}
                 />
               </Grid>
+
               <Grid item xs={12}>
                 <Field
                   as={TextField}
@@ -172,6 +207,8 @@ const EditarUsuario = () => {
                   helperText={touched.endereco && errors.endereco}
                 />
               </Grid>
+
+              {/* Grupos vulneráveis */}
               <Grid item xs={12}>
                 <FormControl fullWidth>
                   <InputLabel>Grupos Vulneráveis</InputLabel>
@@ -180,8 +217,11 @@ const EditarUsuario = () => {
                     name="gruposVulneraveis"
                     multiple
                     label="Grupos Vulneráveis"
-                    renderValue={(selected) => selected.map(value =>
-                      gruposOptions.find(opt => opt.value === value).label).join(', ')}
+                    renderValue={(selected) =>
+                      selected
+                        .map((value) => gruposOptions.find((opt) => opt.value === value)?.label)
+                        .join(', ')
+                    }
                   >
                     {gruposOptions.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
@@ -191,18 +231,16 @@ const EditarUsuario = () => {
                   </Field>
                 </FormControl>
               </Grid>
+
+              {/* Checkbox oferece serviço */}
               <Grid item xs={12}>
                 <FormControlLabel
-                  control={
-                    <Field
-                      as={Checkbox}
-                      name="ofereceServico"
-                      type="checkbox"
-                    />
-                  }
+                  control={<Field as={Checkbox} name="ofereceServico" type="checkbox" />}
                   label="Oferece serviço?"
                 />
               </Grid>
+
+              {/* Especialidade e descrição */}
               {values.ofereceServico && (
                 <>
                   <Grid item xs={12} sm={6}>
@@ -220,9 +258,10 @@ const EditarUsuario = () => {
                           </MenuItem>
                         ))}
                       </Field>
-                      <ErrorMessage name="especialidade" component="div" />
+                      <ErrorMessage name="especialidade" component="div" style={{ color: 'red' }} />
                     </FormControl>
                   </Grid>
+
                   <Grid item xs={12} sm={6}>
                     <Field
                       as={TextField}
@@ -237,19 +276,44 @@ const EditarUsuario = () => {
                   </Grid>
                 </>
               )}
+
+              {/* Foto de perfil atual e upload nova */}
+              <Grid item xs={12}>
+                <Typography>Foto de Perfil Atual:</Typography>
+                <Box sx={{ mb: 2 }}>
+                  <Avatar alt={usuario.nome} src={preview} sx={{ width: 80, height: 80 }} />
+                </Box>
+
+                <Button
+                  variant="contained"
+                  component="label"
+                >
+                  Alterar Foto
+                  <input
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    onChange={(event) => {
+                      const file = event.currentTarget.files[0];
+                      setFieldValue('fotoPerfil', file);
+                      if (file) {
+                        setPreview(URL.createObjectURL(file));
+                      } else {
+                        setPreview(usuario.fotoPerfil ? `http://localhost:8080/uploads/fotos-perfil/${usuario.fotoPerfil}` : null);
+                      }
+                    }}
+                  />
+                </Button>
+              </Grid>
+
+
+              {/* Botões */}
               <Grid item xs={12}>
                 <Box sx={{ display: 'flex', gap: 2 }}>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                  >
+                  <Button type="submit" variant="contained" color="primary">
                     Salvar Alterações
                   </Button>
-                  <Button
-                    variant="outlined"
-                    onClick={() => navigate('/usuarios')}
-                  >
+                  <Button variant="outlined" onClick={() => navigate('/usuarios')}>
                     Cancelar
                   </Button>
                 </Box>

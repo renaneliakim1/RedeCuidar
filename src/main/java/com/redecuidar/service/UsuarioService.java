@@ -90,4 +90,34 @@ public class UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
+    public Usuario atualizarUsuarioComFoto(Long id, UsuarioDTO usuarioDTO, MultipartFile foto) {
+        return usuarioRepository.findById(id).map(usuarioExistente -> {
+            usuarioExistente.setNome(usuarioDTO.getNome());
+            usuarioExistente.setEmail(usuarioDTO.getEmail());
+            usuarioExistente.setTelefone(usuarioDTO.getTelefone());
+            usuarioExistente.setEndereco(usuarioDTO.getEndereco());
+            usuarioExistente.setOfereceServico(usuarioDTO.getOfereceServico());
+            usuarioExistente.setEspecialidade(usuarioDTO.getEspecialidade());
+            usuarioExistente.setDescricaoServico(usuarioDTO.getDescricaoServico());
+
+            // Atualiza senha somente se fornecida (não vazia)
+            if (usuarioDTO.getSenha() != null && !usuarioDTO.getSenha().isBlank()) {
+                usuarioExistente.setSenha(passwordEncoder.encode(usuarioDTO.getSenha()));
+            }
+
+            if (foto != null && !foto.isEmpty()) {
+                try {
+                    String nomeArquivo = UUID.randomUUID() + "_" + foto.getOriginalFilename();
+                    Path caminho = Paths.get("uploads/fotos-perfil", nomeArquivo);
+                    Files.createDirectories(caminho.getParent());
+                    Files.copy(foto.getInputStream(), caminho, StandardCopyOption.REPLACE_EXISTING);
+                    usuarioExistente.setFotoPerfil(nomeArquivo);
+                } catch (IOException e) {
+                    throw new RuntimeException("Erro ao salvar a foto de perfil", e);
+                }
+            }
+
+            return usuarioRepository.save(usuarioExistente);
+        }).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+    }
 }

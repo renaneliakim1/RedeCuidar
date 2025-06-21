@@ -25,15 +25,17 @@ export const createUsuario = async (usuarioData) => {
   }
 };
 
-export const updateUsuario = async (id, usuarioData) => {
-  try {
-    const response = await api.put(`/usuarios/${id}`, usuarioData);
-    return response.data;
-  } catch (error) {
-    console.error('Erro ao atualizar usuário:', error);
-    throw error;
-  }
+export const updateUsuario = (id, formData) => {
+  return axios.put(`http://localhost:8080/usuarios/${id}`, formData, {
+    headers: {
+      // NÃO defina o Content-Type manualmente aqui!
+      // O axios cuida disso automaticamente para multipart/form-data
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    withCredentials: true,
+  });
 };
+
 
 
 
