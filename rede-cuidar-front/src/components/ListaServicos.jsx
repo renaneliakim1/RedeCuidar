@@ -36,67 +36,76 @@ const ListaServicos = () => {
 
       <TableContainer component={Paper}>
         <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Nome</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Telefone</TableCell>
-              <TableCell>Endereço</TableCell>
-              <TableCell>Especialidade</TableCell>
-              <TableCell>Descrição</TableCell>
-              <TableCell>Ações</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {usuarios.map((usuario) => (
-              <TableRow key={usuario.id}>
-                <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Avatar
-                      alt={usuario.nome}
-                      src={usuario.fotoPerfil ? `http://localhost:8080/uploads/fotos-perfil/${usuario.fotoPerfil}` : ''}
-                    />
-                    {usuario.nome}
-                  </Box>
-                </TableCell>
-                <TableCell>{usuario.email}</TableCell>
-                <TableCell>{usuario.telefone}</TableCell>
-                <TableCell>{usuario.endereco}</TableCell>
-                <TableCell>{usuario.especialidade}</TableCell>
-                <TableCell>{usuario.descricaoServico || 'Sem descrição'}</TableCell>
-                <TableCell>
-                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                    <Button
-                      size="small"
-                      variant="contained"
-                      sx={{
-                        mb: 1,
-                        backgroundColor: '#25D366',
-                        color: 'white',
-                        '&:hover': { backgroundColor: '#1ebe57' }
-                      }}
-                      onClick={() => abrirWhatsapp(usuario.telefone)}
-                    >
-                      WhatsApp
-                    </Button>
-                    <Button
-                      size="small"
-                      variant="contained"
-                      sx={{
-                        backgroundColor: '#1976d2',
-                        color: 'white',
-                        '&:hover': { backgroundColor: '#155a9c' }
-                      }}
-                      component={Link}
-                      to={`/perfil/${usuario.id}`}
-                    >
-                      Ver Perfil
-                    </Button>
-                  </Box>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
+         <TableHead>
+           <TableRow>
+             <TableCell>Nome</TableCell>
+             <TableCell>Email</TableCell>
+             <TableCell>Telefone</TableCell>
+             <TableCell>Localidade</TableCell> {/* 🔄 Renomeado */}
+             <TableCell>Especialidade</TableCell>
+             <TableCell>Descrição</TableCell>
+             <TableCell>Ações</TableCell>
+           </TableRow>
+         </TableHead>
+         <TableBody>
+           {usuarios.map((usuario) => {
+             const localidade = `${usuario.bairro || ''}, ${usuario.cidade || ''} - ${usuario.estado || ''}`;
+
+             return (
+               <TableRow key={usuario.id}>
+                 <TableCell>
+                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                     <Avatar
+                       alt={usuario.nome}
+                       src={
+                         usuario.fotoPerfil
+                           ? `http://localhost:8080/uploads/fotos-perfil/${usuario.fotoPerfil}`
+                           : ''
+                       }
+                     />
+                     {usuario.nome}
+                   </Box>
+                 </TableCell>
+                 <TableCell>{usuario.email}</TableCell>
+                 <TableCell>{usuario.telefone}</TableCell>
+                 <TableCell>{localidade}</TableCell> {/* ✅ Mostrando localidade formatada */}
+                 <TableCell>{usuario.especialidade}</TableCell>
+                 <TableCell>{usuario.descricaoServico || 'Sem descrição'}</TableCell>
+                 <TableCell>
+                   <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                     <Button
+                       size="small"
+                       variant="contained"
+                       sx={{
+                         mb: 1,
+                         backgroundColor: '#25D366',
+                         color: 'white',
+                         '&:hover': { backgroundColor: '#1ebe57' }
+                       }}
+                       onClick={() => abrirWhatsapp(usuario.telefone)}
+                     >
+                       WhatsApp
+                     </Button>
+                     <Button
+                       size="small"
+                       variant="contained"
+                       sx={{
+                         backgroundColor: '#1976d2',
+                         color: 'white',
+                         '&:hover': { backgroundColor: '#155a9c' }
+                       }}
+                       component={Link}
+                       to={`/perfil/${usuario.id}`}
+                     >
+                       Ver Perfil
+                     </Button>
+                   </Box>
+                 </TableCell>
+               </TableRow>
+             );
+           })}
+         </TableBody>
+
         </Table>
       </TableContainer>
     </Container>
