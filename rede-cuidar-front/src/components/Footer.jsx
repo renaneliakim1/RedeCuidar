@@ -13,7 +13,7 @@ const Footer = () => {
       }}
     >
       <Typography variant="body1" align="center">
-        © {new Date().getFullYear()} Rede Cuidar+ - Todos os direitos reservados
+        © {new Date().getFullYear()} Rede Cuidar - Todos os direitos reservados
       </Typography>
     </Box>
   );

@@ -78,7 +78,7 @@ const Navbar = () => {
                 onClick={handleMenuOpen}
                 sx={{ textTransform: 'none' }}
               >
-                Bem-vindo, {nomeUsuario}
+                Minha Conta {nomeUsuario}
               </Button>
 
               <Menu
