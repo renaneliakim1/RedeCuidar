@@ -22,8 +22,16 @@ public class UsuarioDTO {
     @NotBlank(message = "Telefone é obrigatório")
     private String telefone;
 
-    @NotBlank(message = "Endereço é obrigatório")
-    private String endereco;
+
+    // Validação básica do formato do CEP (opcional)
+    @Pattern(regexp = "\\d{5}-?\\d{3}", message = "CEP inválido")
+    private String cep;
+
+    private String bairro;
+
+    private String cidade;
+
+    private String estado;
 
     private String fotoPerfil;
 
@@ -38,13 +46,19 @@ public class UsuarioDTO {
         Usuario usuario = new Usuario();
         usuario.setNome(this.nome);
         usuario.setEmail(this.email);
-        usuario.setSenha(this.senha);
+        usuario.setSenha(this.senha); // criptografar no service
         usuario.setTelefone(this.telefone);
+/*
         usuario.setEndereco(this.endereco);
+*/
         usuario.setOfereceServico(this.ofereceServico);
         usuario.setEspecialidade(this.especialidade);
         usuario.setDescricaoServico(this.descricaoServico);
         usuario.setFotoPerfil(this.fotoPerfil);
+        usuario.setCep(this.cep);
+        usuario.setBairro(this.bairro);
+        usuario.setCidade(this.cidade);
+        usuario.setEstado(this.estado);
 
         return usuario;
     }

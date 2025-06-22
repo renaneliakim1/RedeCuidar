@@ -12,20 +12,17 @@ const Especialidade = {
   BARBEIRO_A_DOMICILIO: 'BARBEIRO_A_DOMICILIO',
   FAXINEIRO: 'FAXINEIRO'
 };
-
+// ... (imports mantidos)
 const Perfil = () => {
   const [usuario, setUsuario] = useState(null);
   const [erro, setErro] = useState('');
   const [editando, setEditando] = useState(false);
   const [formData, setFormData] = useState({});
-
   const [novaFoto, setNovaFoto] = useState(null);
   const [previewFoto, setPreviewFoto] = useState(null);
 
-
   useEffect(() => {
     const email = localStorage.getItem("email");
-
     if (!email || email.trim() === '') {
       setErro("Usuário não está logado.");
       return;
@@ -36,13 +33,33 @@ const Perfil = () => {
     })
       .then(response => {
         setUsuario(response.data);
-        setFormData(response.data); // preenche o formulário com os dados
+        setFormData(response.data);
       })
       .catch(error => {
         console.error("Erro ao buscar perfil:", error);
         setErro("Erro ao carregar perfil.");
       });
   }, []);
+
+  const buscarEnderecoViaCep = (cep) => {
+    if (cep.length !== 8) return;
+
+    fetch(`https://viacep.com.br/ws/${cep}/json/`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data.erro) {
+          setFormData(prev => ({
+            ...prev,
+            bairro: data.bairro,
+            cidade: data.localidade,
+            estado: data.uf
+          }));
+        }
+      })
+      .catch(() => {
+        console.error("Erro ao buscar endereço pelo CEP.");
+      });
+  };
 
   const handleSalvar = (e) => {
     e.preventDefault();
@@ -73,9 +90,8 @@ const Perfil = () => {
       });
   };
 
-
   const handleExcluir = () => {
-    if (!window.confirm("Tem certeza que deseja excluir seu perfil? Essa ação não pode ser desfeita.")) return;
+    if (!window.confirm("Tem certeza que deseja excluir seu perfil?")) return;
 
     axios.delete(`http://localhost:8080/usuarios/${usuario.id}`, {
       withCredentials: true
@@ -91,56 +107,36 @@ const Perfil = () => {
       });
   };
 
-  if (erro) {
-    return <p style={{ color: 'red', padding: '2rem' }}>{erro}</p>;
-  }
-
-  if (!usuario) {
-    return <p style={{ padding: '2rem' }}>Carregando perfil...</p>;
-  }
+  if (erro) return <p style={{ color: 'red', padding: '2rem' }}>{erro}</p>;
+  if (!usuario) return <p style={{ padding: '2rem' }}>Carregando perfil...</p>;
 
   return (
     <div style={{ padding: '2rem' }}>
-        <img
-          src={
-            previewFoto
-              ? previewFoto
-              : usuario.fotoPerfil
-              ? `http://localhost:8080/uploads/fotos-perfil/${usuario.fotoPerfil}`
-              : ''
-          }
-          alt="Foto de perfil"
-          style={{
-            width: '150px',
-            height: '150px',
-            borderRadius: '50%',
-            objectFit: 'cover',
-            marginBottom: '1rem'
-          }}
-        />
+      <img
+        src={previewFoto || (usuario.fotoPerfil ? `http://localhost:8080/uploads/fotos-perfil/${usuario.fotoPerfil}` : '')}
+        alt="Foto de perfil"
+        style={{ width: '150px', height: '150px', borderRadius: '50%', objectFit: 'cover', marginBottom: '1rem' }}
+      />
 
-        {editando && (
-          <div style={{ marginBottom: '1rem', color: 'blue'  }}>
-            <label style={{ cursor: 'pointer' }}>
-              <strong>Alterar Foto</strong>
-              <input
-                type="file"
-                accept="image/*"
-                style={{ display: 'none' }}
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    setNovaFoto(file);
-                    setPreviewFoto(URL.createObjectURL(file));
-                  }
-                }}
-              />
-            </label>
-          </div>
-        )}
-
-
-
+      {editando && (
+        <div style={{ marginBottom: '1rem', color: 'blue' }}>
+          <label style={{ cursor: 'pointer' }}>
+            <strong>Alterar </strong>
+            <input
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  setNovaFoto(file);
+                  setPreviewFoto(URL.createObjectURL(file));
+                }
+              }}
+            />
+          </label>
+        </div>
+      )}
 
       <h2>Perfil do Usuário</h2>
 
@@ -166,15 +162,44 @@ const Perfil = () => {
             />
           </label><br />
 
-          <label>Endereço:
+          <label>CEP:
             <input
               type="text"
-              value={formData.endereco || ''}
-              onChange={e => setFormData({ ...formData, endereco: e.target.value })}
+              value={formData.cep || ''}
+              onChange={e => {
+                const cep = e.target.value.replace(/\D/g, '');
+                setFormData({ ...formData, cep });
+                if (cep.length === 8) buscarEnderecoViaCep(cep);
+              }}
             />
           </label><br />
 
-          {/* Checkbox oferece serviços */}
+          <label>Bairro:
+            <input
+              type="text"
+              value={formData.bairro || ''}
+              onChange={e => setFormData({ ...formData, bairro: e.target.value })}
+            />
+          </label><br />
+
+          <label>Cidade:
+            <input
+              type="text"
+              value={formData.cidade || ''}
+              onChange={e => setFormData({ ...formData, cidade: e.target.value })}
+            />
+          </label><br />
+
+          <label>Estado:
+            <input
+              type="text"
+              value={formData.estado || ''}
+              onChange={e => setFormData({ ...formData, estado: e.target.value })}
+            />
+          </label><br />
+
+         <br/>
+
           <label>
             <input
               type="checkbox"
@@ -184,7 +209,6 @@ const Perfil = () => {
             Oferece serviços?
           </label><br />
 
-          {/* Mostrar campos se ofereceServico for true */}
           {formData.ofereceServico && (
             <>
               <label>Especialidade:
@@ -195,9 +219,7 @@ const Perfil = () => {
                 >
                   <option value="" disabled>Selecione uma especialidade</option>
                   {Object.entries(Especialidade).map(([key, val]) => (
-                    <option key={key} value={val}>
-                      {val.replace(/_/g, ' ')}
-                    </option>
+                    <option key={key} value={val}>{val.replace(/_/g, ' ')}</option>
                   ))}
                 </select>
               </label><br />
@@ -219,13 +241,19 @@ const Perfil = () => {
           <p><strong>Nome:</strong> {usuario.nome}</p>
           <p><strong>Email:</strong> {usuario.email}</p>
           <p><strong>Telefone:</strong> {usuario.telefone}</p>
+          <p><strong>CEP:</strong> {usuario.cep}</p>
+          <p><strong>Bairro:</strong> {usuario.bairro}</p>
+          <p><strong>Cidade:</strong> {usuario.cidade}</p>
+          <p><strong>Estado:</strong> {usuario.estado}</p>
           <p><strong>Endereço:</strong> {usuario.endereco}</p>
+
           {usuario.ofereceServico && (
             <>
               <p><strong>Especialidade:</strong> {usuario.especialidade?.replace(/_/g, ' ')}</p>
               <p><strong>Descrição do Serviço:</strong> {usuario.descricaoServico || "Sem descrição"}</p>
             </>
           )}
+
           <div style={{ marginTop: '2rem' }}>
             <button onClick={() => setEditando(true)} style={{ marginRight: '1rem' }}>Editar</button>
             <button onClick={handleExcluir} style={{ backgroundColor: 'red', color: 'white' }}>Excluir Perfil</button>

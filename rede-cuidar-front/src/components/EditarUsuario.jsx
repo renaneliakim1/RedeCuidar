@@ -54,6 +54,11 @@ const EditarUsuario = () => {
     email: Yup.string().email('Email inválido').required('Email é obrigatório'),
     telefone: Yup.string().required('Telefone é obrigatório'),
     endereco: Yup.string().required('Endereço é obrigatório'),
+    cep: Yup.string().required('CEP é obrigatório').length(8, 'CEP deve ter 8 dígitos'),
+    bairro: Yup.string().required('Bairro é obrigatório'),
+    cidade: Yup.string().required('Cidade é obrigatória'),
+    estado: Yup.string().required('Estado é obrigatório'),
+
     especialidade: Yup.string().when('ofereceServico', {
       is: true,
       then: Yup.string().required('Especialidade é obrigatória para prestadores'),
@@ -149,12 +154,17 @@ const EditarUsuario = () => {
           email: usuario.email,
           telefone: usuario.telefone,
           endereco: usuario.endereco,
+          cep: usuario.cep || '',
+          bairro: usuario.bairro || '',
+          cidade: usuario.cidade || '',
+          estado: usuario.estado || '',
           ofereceServico: usuario.ofereceServico,
           especialidade: usuario.especialidade || '',
           descricaoServico: usuario.descricaoServico || '',
           gruposVulneraveis: usuario.gruposVulneraveis || [],
           fotoPerfil: null,
         }}
+
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
@@ -197,16 +207,77 @@ const EditarUsuario = () => {
                 />
               </Grid>
 
-              <Grid item xs={12}>
-                <Field
-                  as={TextField}
-                  name="endereco"
-                  label="Endereço"
-                  fullWidth
-                  error={touched.endereco && !!errors.endereco}
-                  helperText={touched.endereco && errors.endereco}
-                />
-              </Grid>
+             <Grid item xs={12}>
+               <Field
+                 as={TextField}
+                 name="cep"
+                 label="CEP"
+                 fullWidth
+                 error={touched.cep && !!errors.cep}
+                 helperText={touched.cep && errors.cep}
+                 onChange={(e) => {
+                   const cep = e.target.value.replace(/\D/g, '');
+                   setFieldValue('cep', cep);
+
+                   if (cep.length === 8) {
+                     fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                       .then(res => res.json())
+                       .then(data => {
+                         if (!data.erro) {
+                           setFieldValue('bairro', data.bairro);
+                           setFieldValue('cidade', data.localidade);
+                           setFieldValue('estado', data.uf);
+                         }
+                       });
+                   }
+                 }}
+               />
+             </Grid>
+
+             <Grid item xs={12} sm={6}>
+               <Field
+                 as={TextField}
+                 name="bairro"
+                 label="Bairro"
+                 fullWidth
+                 error={touched.bairro && !!errors.bairro}
+                 helperText={touched.bairro && errors.bairro}
+               />
+             </Grid>
+
+             <Grid item xs={12} sm={6}>
+               <Field
+                 as={TextField}
+                 name="cidade"
+                 label="Cidade"
+                 fullWidth
+                 error={touched.cidade && !!errors.cidade}
+                 helperText={touched.cidade && errors.cidade}
+               />
+             </Grid>
+
+             <Grid item xs={12} sm={6}>
+               <Field
+                 as={TextField}
+                 name="estado"
+                 label="Estado"
+                 fullWidth
+                 error={touched.estado && !!errors.estado}
+                 helperText={touched.estado && errors.estado}
+               />
+             </Grid>
+
+             <Grid item xs={12}>
+               <Field
+                 as={TextField}
+                 name="endereco"
+                 label="Endereço Completo"
+                 fullWidth
+                 error={touched.endereco && !!errors.endereco}
+                 helperText={touched.endereco && errors.endereco}
+               />
+             </Grid>
+
 
               {/* Grupos vulneráveis */}
               <Grid item xs={12}>

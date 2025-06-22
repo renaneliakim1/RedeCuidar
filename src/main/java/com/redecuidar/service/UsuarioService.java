@@ -73,7 +73,8 @@ public class UsuarioService {
 
     public Usuario criarUsuarioComFoto(UsuarioDTO usuarioDTO, MultipartFile foto) {
         Usuario usuario = usuarioDTO.toUsuario();
-        usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+        usuario.setSenha(passwordEncoder.encode(usuarioDTO.getSenha()));
+
 
         if (foto != null && !foto.isEmpty()) {
             try {
@@ -95,10 +96,16 @@ public class UsuarioService {
             usuarioExistente.setNome(usuarioDTO.getNome());
             usuarioExistente.setEmail(usuarioDTO.getEmail());
             usuarioExistente.setTelefone(usuarioDTO.getTelefone());
-            usuarioExistente.setEndereco(usuarioDTO.getEndereco());
+
             usuarioExistente.setOfereceServico(usuarioDTO.getOfereceServico());
             usuarioExistente.setEspecialidade(usuarioDTO.getEspecialidade());
             usuarioExistente.setDescricaoServico(usuarioDTO.getDescricaoServico());
+
+            // ✅ CAMPOS DE ENDEREÇO
+            usuarioExistente.setCep(usuarioDTO.getCep());
+            usuarioExistente.setBairro(usuarioDTO.getBairro());
+            usuarioExistente.setCidade(usuarioDTO.getCidade());
+            usuarioExistente.setEstado(usuarioDTO.getEstado());
 
             // Atualiza senha somente se fornecida (não vazia)
             if (usuarioDTO.getSenha() != null && !usuarioDTO.getSenha().isBlank()) {

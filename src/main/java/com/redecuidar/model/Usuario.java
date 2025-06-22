@@ -29,8 +29,12 @@ public class Usuario {
     @NotBlank(message = "Telefone é obrigatório")
     private String telefone;
 
-    @NotBlank(message = "Endereço é obrigatório")
-    private String endereco;
+
+    private String cep;
+    private String bairro;
+    private String cidade;
+    private String estado;
+
 
     private boolean ofereceServico;
 
