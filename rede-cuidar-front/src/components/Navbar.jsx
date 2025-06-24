@@ -10,8 +10,15 @@ import {
   MenuItem,
   Switch,
   FormControlLabel,
+  IconButton,
+  Tooltip
 } from '@mui/material';
+
 import { useThemeContext } from './ThemeContext';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+
+
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -84,18 +91,20 @@ const Navbar = () => {
           )}
 
           {/* 🔘 Botão de tema claro/escuro */}
-          <FormControlLabel
-            control={
-              <Switch
-                checked={mode === 'dark'}
-                onChange={toggleTheme}
-                color="secondary"
-              />
-            }
-            label={mode === 'dark' ? 'Tema Claro' : 'Tema Escuro'}
-            labelPlacement="start"
-            sx={{ color: 'white' }}
-          />
+            <Tooltip title={mode === 'dark' ? 'Tema claro' : 'Tema escuro'}>
+              <IconButton
+                onClick={toggleTheme}
+                sx={{
+                  color: 'white',
+                  transition: 'transform 0.3s ease',
+                  '&:hover': {
+                    transform: 'rotate(20deg)',
+                  },
+                }}
+              >
+                {mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
+              </IconButton>
+            </Tooltip>
         </Box>
       </Toolbar>
     </AppBar>
