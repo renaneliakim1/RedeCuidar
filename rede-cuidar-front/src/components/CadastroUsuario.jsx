@@ -18,11 +18,18 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 
-// ... imports (sem alterações)
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+
+
 
 const CadastroUsuario = () => {
   const navigate = useNavigate();
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
 
   const Especialidade = {
     CUIDADOR: 'CUIDADOR',
@@ -128,7 +135,34 @@ const CadastroUsuario = () => {
           <Form style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <Field as={TextField} name="nome" label="Nome Completo" fullWidth error={touched.nome && !!errors.nome} helperText={touched.nome && errors.nome} />
             <Field as={TextField} name="email" label="Email" type="email" fullWidth error={touched.email && !!errors.email} helperText={touched.email && errors.email} />
-            <Field as={TextField} name="senha" label="Senha" type="password" fullWidth error={touched.senha && !!errors.senha} helperText={touched.senha && errors.senha} />
+
+            <Field
+              as={TextField}
+              name="senha"
+              label="Senha"
+              type={showPassword ? 'text' : 'password'}
+              fullWidth
+              error={touched.senha && !!errors.senha}
+              helperText={touched.senha && errors.senha}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+            />
+
+
+
+
+
+
             <Field as={TextField} name="telefone" label="Telefone" fullWidth error={touched.telefone && !!errors.telefone} helperText={touched.telefone && errors.telefone} />
 
          {/*    <Field

@@ -13,10 +13,18 @@ import {
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+
+
 const Login = () => {
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
 
   const validationSchema = Yup.object().shape({
     email: Yup.string().email('Email inválido').required('Email é obrigatório'),
@@ -89,16 +97,29 @@ const Login = () => {
                 helperText={touched.email && errors.email}
               />
 
-              <Field
-                as={TextField}
-                name="senha"
-                label="Senha"
-                type="password"
-                fullWidth
-                margin="normal"
-                error={touched.senha && !!errors.senha}
-                helperText={touched.senha && errors.senha}
-              />
+
+            <Field
+              as={TextField}
+              name="senha"
+              label="Senha"
+              type={showPassword ? 'text' : 'password'}
+              fullWidth
+              margin="normal"
+              error={touched.senha && !!errors.senha}
+              helperText={touched.senha && errors.senha}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+            />
 
               <Button
                 type="submit"
