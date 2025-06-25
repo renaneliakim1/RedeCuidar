@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
@@ -11,25 +11,22 @@ import {
   InputLabel,
   FormControl,
   Select,
-  Grid,
   Typography,
   Box,
-  Alert
+  Alert,
+  InputAdornment,
+  IconButton
 } from '@mui/material';
-import axios from 'axios';
-
-import InputAdornment from '@mui/material/InputAdornment';
-import IconButton from '@mui/material/IconButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-
-
+import axios from 'axios';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const CadastroUsuario = () => {
   const navigate = useNavigate();
+  const recaptchaRef = useRef(null);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-
 
   const Especialidade = {
     CUIDADOR: 'CUIDADOR',
@@ -66,16 +63,22 @@ const CadastroUsuario = () => {
   });
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+    const captchaToken = recaptchaRef.current?.getValue();
+    if (!captchaToken) {
+      setError('Por favor, confirme que você não é um robô.');
+      setSubmitting(false);
+      return;
+    }
+
     try {
       const formData = new FormData();
+      formData.append('captchaToken', captchaToken);
 
       const usuarioData = {
         nome: values.nome,
         email: values.email,
         senha: values.senha,
         telefone: values.telefone,
-
-
         cep: values.cep,
         bairro: values.bairro,
         cidade: values.cidade,
@@ -102,6 +105,7 @@ const CadastroUsuario = () => {
       setError(error.response?.data?.message || "Erro ao cadastrar usuário");
     } finally {
       setSubmitting(false);
+      recaptchaRef.current?.reset();
     }
   };
 
@@ -147,10 +151,7 @@ const CadastroUsuario = () => {
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowPassword((prev) => !prev)}
-                      edge="end"
-                    >
+                    <IconButton onClick={() => setShowPassword((prev) => !prev)} edge="end">
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
@@ -158,22 +159,7 @@ const CadastroUsuario = () => {
               }}
             />
 
-
-
-
-
-
             <Field as={TextField} name="telefone" label="Telefone" fullWidth error={touched.telefone && !!errors.telefone} helperText={touched.telefone && errors.telefone} />
-
-         {/*    <Field
-              as={TextField}
-              name="endereco"
-              label="Endereço"
-              fullWidth
-              error={touched.endereco && !!errors.endereco}
-              helperText={touched.endereco && errors.endereco}
-            /> */}
-
 
             <Field
               as={TextField}
@@ -202,7 +188,6 @@ const CadastroUsuario = () => {
             <Field as={TextField} name="bairro" label="Bairro" fullWidth error={touched.bairro && !!errors.bairro} helperText={touched.bairro && errors.bairro} />
             <Field as={TextField} name="cidade" label="Cidade" fullWidth error={touched.cidade && !!errors.cidade} helperText={touched.cidade && errors.cidade} />
             <Field as={TextField} name="estado" label="Estado" fullWidth error={touched.estado && !!errors.estado} helperText={touched.estado && errors.estado} />
-
 
             <input
               type="file"
@@ -258,7 +243,15 @@ const CadastroUsuario = () => {
               </>
             )}
 
-            <Button type="submit" variant="contained" color="primary" fullWidth size="large" sx={{ mt: 2 }}>
+            <Box sx={{ my: 2, display: 'flex', justifyContent: 'center' }}>
+              <ReCAPTCHA
+                ref={recaptchaRef}
+                sitekey="6LdfhWwrAAAAAKasgt0KNn1C5w48Volp0IVzK4HO
+"
+              />
+            </Box>
+
+            <Button type="submit" variant="contained" color="primary" fullWidth size="large">
               Cadastrar
             </Button>
           </Form>

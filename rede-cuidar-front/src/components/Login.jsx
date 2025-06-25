@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   TextField,
@@ -8,23 +8,22 @@ import {
   Link,
   Alert,
   Container,
-  CircularProgress
+  CircularProgress,
+  InputAdornment,
+  IconButton
 } from '@mui/material';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
-
-import InputAdornment from '@mui/material/InputAdornment';
-import IconButton from '@mui/material/IconButton';
+import ReCAPTCHA from 'react-google-recaptcha';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-
 
 const Login = () => {
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
+  const recaptchaRef = useRef(null);
 
   const validationSchema = Yup.object().shape({
     email: Yup.string().email('Email inválido').required('Email é obrigatório'),
@@ -34,10 +33,19 @@ const Login = () => {
   const handleSubmit = async (values) => {
     setLoading(true);
     setError('');
+
+    const captchaToken = recaptchaRef.current?.getValue();
+    if (!captchaToken) {
+      setError('Por favor, confirme que você não é um robô.');
+      setLoading(false);
+      return;
+    }
+
     try {
       const formData = new URLSearchParams();
       formData.append('email', values.email);
       formData.append('senha', values.senha);
+      formData.append('captchaToken', captchaToken);
 
       const response = await fetch('http://localhost:8080/api/auth/login', {
         method: 'POST',
@@ -48,12 +56,11 @@ const Login = () => {
         body: formData.toString(),
       });
 
-      const texto = await response.text(); // ✅ lê o corpo apenas uma vez
+      const texto = await response.text();
 
       if (response.ok) {
-        console.log('Login bem-sucedido:', texto);
         localStorage.setItem('token', 'logado');
-        localStorage.setItem('email', values.email); // ou outro valor vindo do back
+        localStorage.setItem('email', values.email);
         window.dispatchEvent(new Event('authChange'));
         navigate('/');
       } else {
@@ -63,9 +70,9 @@ const Login = () => {
       setError(error.message);
     } finally {
       setLoading(false);
+      recaptchaRef.current?.reset();
     }
   };
-
 
   return (
     <Container maxWidth="sm">
@@ -85,41 +92,51 @@ const Login = () => {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ errors, touched }) => (
+          {({ values, errors, touched, handleChange, handleBlur }) => (
             <Form>
-              <Field
-                as={TextField}
+              <TextField
                 name="email"
                 label="Email"
                 fullWidth
                 margin="normal"
+                value={values.email}
+                onChange={handleChange}
+                onBlur={handleBlur}
                 error={touched.email && !!errors.email}
                 helperText={touched.email && errors.email}
               />
 
+              <TextField
+                name="senha"
+                label="Senha"
+                fullWidth
+                margin="normal"
+                type={showPassword ? 'text' : 'password'}
+                value={values.senha}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.senha && !!errors.senha}
+                helperText={touched.senha && errors.senha}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword((prev) => !prev)}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+              />
 
-            <Field
-              as={TextField}
-              name="senha"
-              label="Senha"
-              type={showPassword ? 'text' : 'password'}
-              fullWidth
-              margin="normal"
-              error={touched.senha && !!errors.senha}
-              helperText={touched.senha && errors.senha}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowPassword((prev) => !prev)}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                )
-              }}
-            />
+              <Box sx={{ my: 2, display: 'flex', justifyContent: 'center' }}>
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey="6LdfhWwrAAAAAKasgt0KNn1C5w48Volp0IVzK4HO"
+                />
+              </Box>
 
               <Button
                 type="submit"
