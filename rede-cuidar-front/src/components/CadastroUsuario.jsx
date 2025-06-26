@@ -244,11 +244,13 @@ const CadastroUsuario = () => {
             )}
 
             <Box sx={{ my: 2, display: 'flex', justifyContent: 'center' }}>
-              <ReCAPTCHA
-                ref={recaptchaRef}
-                sitekey="6LdfhWwrAAAAAKasgt0KNn1C5w48Volp0IVzK4HO
-"
-              />
+               <ReCAPTCHA
+                 ref={recaptchaRef}
+                 sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+
+               />
+
+
             </Box>
 
             <Button type="submit" variant="contained" color="primary" fullWidth size="large">

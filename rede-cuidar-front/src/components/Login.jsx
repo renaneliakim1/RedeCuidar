@@ -131,12 +131,15 @@ const Login = () => {
                 }}
               />
 
-              <Box sx={{ my: 2, display: 'flex', justifyContent: 'center' }}>
-                <ReCAPTCHA
-                  ref={recaptchaRef}
-                  sitekey="6LdfhWwrAAAAAKasgt0KNn1C5w48Volp0IVzK4HO"
-                />
-              </Box>
+             <Box sx={{ my: 2, display: 'flex', justifyContent: 'center' }}>
+               <ReCAPTCHA
+                 ref={recaptchaRef}
+                 sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+
+               />
+
+
+             </Box>
 
               <Button
                 type="submit"
