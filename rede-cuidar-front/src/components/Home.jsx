@@ -16,6 +16,8 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 // CSS do slick-carousel
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { useNavigate } from 'react-router-dom';
+
 
 // Setas azuis customizadas para o react-slick
 const BluePrevArrow = (props) => {
@@ -65,6 +67,7 @@ const BlueNextArrow = (props) => {
 const Home = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [prestadores, setPrestadores] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const logado = localStorage.getItem('token') === 'logado';
@@ -143,19 +146,17 @@ const Home = () => {
             </Button>
           )}
 
-          <Button
-            variant="outlined"
-            size="large"
-            component={Link}
-            to="/servicos"
-            sx={{
-              color: '#1976d2',
-              borderColor: '#1976d2',
-              '&:hover': { borderColor: '#1565c0' }
-            }}
-          >
-            Encontrar Serviços
-          </Button>
+            <Button variant="contained" onClick={() => {
+              if (localStorage.getItem('token') === 'logado') {
+                navigate('/servicos');
+              } else {
+                navigate('/bloqueado');
+              }
+            }}>
+              Encontrar Serviços
+            </Button>
+
+
         </Box>
       </Box>
 
@@ -214,24 +215,39 @@ const Home = () => {
                 </CardContent>
 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', px: 2, pb: 1 }}>
-                  <Button
-                    size="small"
-                    component={Link}
-                    to={`/perfil/${usuario.id}`}
-                    sx={{
-                      color: '#1976d2',
-                      '&:hover': { textDecoration: 'underline' }
-                    }}
-                  >
-                    Ver Perfil
-                  </Button>
-                  <IconButton
-                    color="success"
-                    onClick={() => abrirWhatsapp(usuario.telefone)}
-                    aria-label="Whatsapp"
-                  >
-                    <WhatsAppIcon />
-                  </IconButton>
+                    <Button
+                      size="small"
+                      onClick={() => {
+                        if (localStorage.getItem('token') === 'logado') {
+                          navigate(`/perfil/${usuario.id}`);
+                        } else {
+                          navigate('/bloqueado');
+                        }
+                      }}
+                      sx={{
+                        color: '#1976d2',
+                        '&:hover': { textDecoration: 'underline' }
+                      }}
+                    >
+                      Ver Perfil
+                    </Button>
+
+
+                 <IconButton
+                   color="success"
+                   onClick={() => {
+                     if (localStorage.getItem('token') === 'logado') {
+                       abrirWhatsapp(usuario.telefone);
+                     } else {
+                       navigate('/bloqueado'); // ou `setModalAberto(true)` se quiser usar o modal
+                     }
+                   }}
+                   aria-label="Whatsapp"
+                 >
+                   <WhatsAppIcon />
+                 </IconButton>
+
+
                 </Box>
               </Card>
             </Box>

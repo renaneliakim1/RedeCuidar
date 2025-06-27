@@ -15,6 +15,8 @@ import Login from './components/Login';
 import PrivateRoute from './components/PrivateRoute';
 import Perfil from './components/Perfil';
 import { useThemeContext } from './components/ThemeContext';
+import Bloqueado from './components/Bloqueado';
+
 
 
 
@@ -41,6 +43,7 @@ function App() {
           <Route path="/servicos/novo" element={<PrivateRoute><CadastroServico /></PrivateRoute>} />
           <Route path="/servicos/editar/:id" element={<PrivateRoute><EditarServico /></PrivateRoute>} />
           <Route path="/servicos/:id" element={<PrivateRoute><DetalheServico /></PrivateRoute>} />
+          <Route path="/bloqueado" element={<Bloqueado />} />
         </Routes>
       </main>
       <Footer />
