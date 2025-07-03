@@ -17,19 +17,28 @@ const Footer = () => {
         textAlign: 'center',
       }}
     >
-    <Typography variant="body2" sx={{ mb: 1 }}>
-            <Link
-              component={RouterLink}
-              to="/quem-somos"
-              underline="hover"
-              color="inherit"
-              sx={{ fontWeight: 'bold' }}
-            >
-              Quem Somos
-            </Link>
-    </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 3, mb: 1 }}>
+        <Link
+          component={RouterLink}
+          to="/quem-somos"
+          underline="hover"
+          color="inherit"
+          sx={{ fontWeight: 'bold' }}
+        >
+          Quem Somos
+        </Link>
 
-     <Typography variant="body1" component="p">
+        <Link
+          component={RouterLink}
+          to="/fale-conosco"
+          underline="hover"
+          color="inherit"
+        >
+          Fale Conosco
+        </Link>
+      </Box>
+
+      <Typography variant="body1" component="p">
         © {new Date().getFullYear()} Rede Cuidar - Todos os direitos reservados
       </Typography>
     </Box>

@@ -73,6 +73,8 @@ import PrivateRoute from './components/PrivateRoute';
 import Perfil from './components/Perfil';
 import Bloqueado from './components/Bloqueado';
 import QuemSomos from './components/QuemSomos';
+import FaleConosco from './components/FaleConosco';
+
 
 function App() {
   const theme = useTheme();
@@ -103,6 +105,8 @@ function App() {
           <Route path="/servicos/:id" element={<PrivateRoute><DetalheServico /></PrivateRoute>} />
           <Route path="/bloqueado" element={<Bloqueado />} />
           <Route path="/quem-somos" element={<QuemSomos />} />
+          <Route path="/fale-conosco" element={<FaleConosco />} />
+
 
         </Routes>
       </main>
