@@ -121,16 +121,16 @@ const Home = () => {
   };
 
   return (
-    <Container maxWidth="md">
-      <Box sx={{ my: 4, textAlign: 'center' }}>
-        <Typography variant="h3" gutterBottom>
-          Bem-vindo ao Rede Cuidar
+    <Container maxWidth="lg">
+      <Box sx={{ my: 6, textAlign: 'center' }}>
+        <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 2 }}>
+          Bem-vindo ao <span style={{ color: '#1976d2' }}>Rede Cuidar</span>
         </Typography>
-        <Typography variant="h5" paragraph>
+        <Typography variant="h6" color="text.secondary">
           Conectando quem precisa de cuidados com quem pode oferecer
         </Typography>
 
-        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 2, mt: 4 }}>
           {!isLoggedIn && (
             <Button
               variant="contained"
@@ -139,6 +139,8 @@ const Home = () => {
               to="/cadastro"
               sx={{
                 backgroundColor: '#1976d2',
+                borderRadius: '50px',
+                px: 4,
                 '&:hover': { backgroundColor: '#1565c0' }
               }}
             >
@@ -146,22 +148,28 @@ const Home = () => {
             </Button>
           )}
 
-            <Button variant="contained" onClick={() => {
-              if (localStorage.getItem('token') === 'logado') {
-                navigate('/servicos');
-              } else {
-                navigate('/bloqueado');
+          <Button
+            variant="outlined"
+            size="large"
+            onClick={() => navigate(isLoggedIn ? '/servicos' : '/bloqueado')}
+            sx={{
+              borderColor: '#1976d2',
+              color: '#1976d2',
+              borderRadius: '50px',
+              px: 4,
+              '&:hover': {
+                backgroundColor: '#e3f2fd',
+                borderColor: '#1565c0',
+                color: '#1565c0',
               }
-            }}>
-              Encontrar Serviços
-            </Button>
-
-
+            }}
+          >
+            Encontrar Serviços
+          </Button>
         </Box>
       </Box>
 
-      {/* Seção de Prestadores de Serviço com carrossel */}
-      <Typography variant="h5" sx={{ mt: 6, mb: 2 }}>
+      <Typography variant="h5" sx={{ mt: 8, mb: 4, fontWeight: 600 }}>
         Profissionais em destaque
       </Typography>
 
@@ -169,85 +177,60 @@ const Home = () => {
         <Slider {...settings}>
           {prestadores.map((usuario) => (
             <Box key={usuario.id} px={1}>
-              <Card sx={{
-                height: 260,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                overflow: 'hidden',
-                mx: 1
-              }}>
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                    <Avatar
-                      src={usuario.fotoPerfil ? `http://localhost:8080/uploads/fotos-perfil/${usuario.fotoPerfil}` : ''}
-                      alt={usuario.nome}
-                      sx={{ width: 56, height: 56 }}
-                    />
-                    <Box>
-                      <Typography variant="subtitle1" fontWeight="bold" noWrap>
-                        {usuario.nome}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" noWrap>
-                        {usuario.especialidade}
-                      </Typography>
-                    </Box>
-                  </Box>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
-                  >
+              <Card
+                sx={{
+                  height: 320,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  borderRadius: 1,
+                  overflow: 'hidden',
+                  boxShadow: 1,
+                  transition: 'transform 0.3s',
+                  '&:hover': { transform: 'scale(1.02)' }
+                }}
+              >
+                <Avatar
+                  src={usuario.fotoPerfil ? `http://localhost:8080/uploads/fotos-perfil/${usuario.fotoPerfil}` : ''}
+                  alt={usuario.nome}
+                  sx={{
+                    width: 80,
+                    height: 80,
+                    alignSelf: 'center',
+                    mt: 2,
+                    mb: 1
+                  }}
+                />
+                <CardContent sx={{ flexGrow: 1, textAlign: 'center' }}>
+                  <Typography variant="subtitle1" fontWeight="bold" noWrap>
+                    {usuario.nome}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" noWrap>
+                    {usuario.especialidade}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
                     {usuario.bairro}, {usuario.cidade} - {usuario.estado}
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{
-                      mt: 1,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      maxHeight: 50,
-                    }}
-                  >
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1, maxHeight: 50, overflow: 'hidden' }}>
                     {usuario.descricaoServico || 'Sem descrição'}
                   </Typography>
                 </CardContent>
 
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', px: 2, pb: 1 }}>
-                    <Button
-                      size="small"
-                      onClick={() => {
-                        if (localStorage.getItem('token') === 'logado') {
-                          navigate(`/perfil/${usuario.id}`);
-                        } else {
-                          navigate('/bloqueado');
-                        }
-                      }}
-                      sx={{
-                        color: '#1976d2',
-                        '&:hover': { textDecoration: 'underline' }
-                      }}
-                    >
-                      Ver Perfil
-                    </Button>
-
-
-                 <IconButton
-                   color="success"
-                   onClick={() => {
-                     if (localStorage.getItem('token') === 'logado') {
-                       abrirWhatsapp(usuario.telefone);
-                     } else {
-                       navigate('/bloqueado'); // ou `setModalAberto(true)` se quiser usar o modal
-                     }
-                   }}
-                   aria-label="Whatsapp"
-                 >
-                   <WhatsAppIcon />
-                 </IconButton>
-
-
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', px: 2, pb: 2 }}>
+                  <Button
+                    size="small"
+                    onClick={() => navigate(isLoggedIn ? `/perfil/${usuario.id}` : '/bloqueado')}
+                    sx={{ color: '#1976d2' }}
+                  >
+                    Ver Perfil
+                  </Button>
+                  <IconButton
+                    color="success"
+                    onClick={() => (isLoggedIn ? abrirWhatsapp(usuario.telefone) : navigate('/bloqueado'))}
+                    aria-label="Whatsapp"
+                  >
+                    <WhatsAppIcon />
+                  </IconButton>
                 </Box>
               </Card>
             </Box>
@@ -255,6 +238,7 @@ const Home = () => {
         </Slider>
       </Box>
     </Container>
+
   );
 };
 

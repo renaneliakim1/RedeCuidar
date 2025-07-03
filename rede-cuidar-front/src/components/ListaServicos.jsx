@@ -1,15 +1,23 @@
-import { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, Paper, Typography,
-  Button, Container, Box, Avatar, TextField
+  Container,
+  Typography,
+  TextField,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Paper,
+  Avatar,
+  Button,
+  Box,
+  InputAdornment,
 } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-
-import SearchIcon from '@mui/icons-material/Search';
-import InputAdornment from '@mui/material/InputAdornment';
-
 
 const ListaServicos = () => {
   const [usuarios, setUsuarios] = useState([]);
@@ -18,10 +26,10 @@ const ListaServicos = () => {
   useEffect(() => {
     const fetchUsuarios = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/usuarios/oferecendo-servicos");
+        const response = await axios.get('http://localhost:8080/usuarios/oferecendo-servicos');
         setUsuarios(response.data);
       } catch (error) {
-        console.error("Erro ao buscar usuários com serviços:", error);
+        console.error('Erro ao buscar usuários com serviços:', error);
       }
     };
 
@@ -34,22 +42,22 @@ const ListaServicos = () => {
   };
 
   const filtrarUsuarios = usuarios.filter((usuario) => {
-    const localidade = `${usuario.bairro || ''} ${usuario.cidade || ''} ${usuario.estado || ''}`;
+    const localidade = `${usuario.bairro || ''} ${usuario.cidade || ''} ${usuario.estado || ''}`.toLowerCase();
     const busca = termoBusca.toLowerCase();
 
     return (
-      usuario.nome?.toLowerCase().includes(busca) ||
-      usuario.email?.toLowerCase().includes(busca) ||
-      usuario.telefone?.toLowerCase().includes(busca) ||
-      localidade.toLowerCase().includes(busca) ||
-      usuario.especialidade?.toLowerCase().includes(busca) ||
-      usuario.descricaoServico?.toLowerCase().includes(busca)
+      (usuario.nome && usuario.nome.toLowerCase().includes(busca)) ||
+      (usuario.email && usuario.email.toLowerCase().includes(busca)) ||
+      (usuario.telefone && usuario.telefone.toLowerCase().includes(busca)) ||
+      localidade.includes(busca) ||
+      (usuario.especialidade && usuario.especialidade.toLowerCase().includes(busca)) ||
+      (usuario.descricaoServico && usuario.descricaoServico.toLowerCase().includes(busca))
     );
   });
 
   return (
     <Container sx={{ mt: 4 }}>
-      <Typography variant="h4" align="center" sx={{ mb: 3 }}>
+      <Typography variant="h4" align="center" gutterBottom fontWeight={600}>
         Profissionais disponíveis
       </Typography>
 
@@ -57,9 +65,9 @@ const ListaServicos = () => {
         label="Buscar serviços ou profissionais"
         variant="outlined"
         fullWidth
-        sx={{ mb: 3 }}
         value={termoBusca}
         onChange={(e) => setTermoBusca(e.target.value)}
+        sx={{ mb: 3 }}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -68,7 +76,6 @@ const ListaServicos = () => {
           ),
         }}
       />
-
 
       <TableContainer component={Paper}>
         <Table>
@@ -83,62 +90,73 @@ const ListaServicos = () => {
               <TableCell>Ações</TableCell>
             </TableRow>
           </TableHead>
+
           <TableBody>
-            {filtrarUsuarios.map((usuario) => {
-              const localidade = `${usuario.bairro || ''}, ${usuario.cidade || ''} - ${usuario.estado || ''}`;
-              return (
-                <TableRow key={usuario.id}>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Avatar
-                        alt={usuario.nome}
-                        src={
-                          usuario.fotoPerfil
-                            ? `http://localhost:8080/uploads/fotos-perfil/${usuario.fotoPerfil}`
-                            : ''
-                        }
-                      />
-                      {usuario.nome}
-                    </Box>
-                  </TableCell>
-                  <TableCell>{usuario.email}</TableCell>
-                  <TableCell>{usuario.telefone}</TableCell>
-                  <TableCell>{localidade}</TableCell>
-                  <TableCell>{usuario.especialidade}</TableCell>
-                  <TableCell>{usuario.descricaoServico || 'Sem descrição'}</TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                      <Button
-                        size="small"
-                        variant="contained"
-                        sx={{
-                          mb: 1,
-                          backgroundColor: '#25D366',
-                          color: 'white',
-                          '&:hover': { backgroundColor: '#1ebe57' }
-                        }}
-                        onClick={() => abrirWhatsapp(usuario.telefone)}
-                      >
-                        WhatsApp
-                      </Button>
-                      <Button
-                        size="small"
-                        variant="contained"
-                        sx={{
-                          backgroundColor: '#1976d2',
-                          color: 'white',
-                          '&:hover': { backgroundColor: '#155a9c' }
-                        }}
-                        component={Link}
-                        to={`/perfil/${usuario.id}`}
-                      >
-                        Ver Perfil
-                      </Button>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+            {filtrarUsuarios.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} align="center">
+                  Nenhum profissional encontrado.
+                </TableCell>
+              </TableRow>
+            ) : (
+              filtrarUsuarios.map((usuario) => {
+                const localidade = `${usuario.bairro || ''}, ${usuario.cidade || ''} - ${usuario.estado || ''}`;
+
+                return (
+                  <TableRow key={usuario.id}>
+                    <TableCell>
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <Avatar
+                          alt={usuario.nome}
+                          src={
+                            usuario.fotoPerfil
+                              ? `http://localhost:8080/uploads/fotos-perfil/${usuario.fotoPerfil}`
+                              : undefined
+                          }
+                        />
+                        {usuario.nome}
+                      </Box>
+                    </TableCell>
+
+                    <TableCell>{usuario.email}</TableCell>
+                    <TableCell>{usuario.telefone}</TableCell>
+                    <TableCell>{localidade}</TableCell>
+                    <TableCell>{usuario.especialidade}</TableCell>
+                    <TableCell>{usuario.descricaoServico || 'Sem descrição'}</TableCell>
+                    <TableCell>
+                      <Box display="flex" flexDirection="column" gap={1}>
+                        <Button
+                          size="small"
+                          variant="contained"
+                          sx={{
+                            backgroundColor: '#25D366',
+                            '&:hover': { backgroundColor: '#1ebe57' },
+                            color: 'white',
+                          }}
+                          onClick={() => abrirWhatsapp(usuario.telefone)}
+                        >
+                          WhatsApp
+                        </Button>
+
+                        <Button
+                          size="small"
+                          variant="contained"
+                          sx={{
+                            backgroundColor: '#1976d2',
+                            '&:hover': { backgroundColor: '#155a9c' },
+                            color: 'white',
+                          }}
+                          component={Link}
+                          to={`/perfil/${usuario.id}`}
+                        >
+                          Ver Perfil
+                        </Button>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
           </TableBody>
         </Table>
       </TableContainer>

@@ -1,34 +1,41 @@
-import { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  Table,
-  TableBody,
-  TableCell,
+  Box,
+  Typography,
+  Button,
   TableContainer,
+  Table,
   TableHead,
   TableRow,
+  TableCell,
+  TableBody,
   Paper,
-  Button,
-  Typography,
-  Box
+  CircularProgress,
+  Alert,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
-/* import { getUsuarios, getPrestadores } from '../services/usuarioService';*/
-import { getUsuarios } from '../services/usuarioService';
-
+import axios from 'axios';
 
 const ListaUsuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [mostrarPrestadores, setMostrarPrestadores] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState('');
 
   useEffect(() => {
     const fetchUsuarios = async () => {
+      setLoading(true);
+      setErro('');
       try {
-        const data = mostrarPrestadores
-          ? await getPrestadores()
-          : await getUsuarios();
-        setUsuarios(data.data);
+        const url = mostrarPrestadores
+          ? 'http://localhost:8080/usuarios/prestadores' // ajuste conforme endpoint correto
+          : 'http://localhost:8080/usuarios';
+        const response = await axios.get(url);
+        setUsuarios(response.data);
       } catch (error) {
-        console.error('Erro ao buscar usuários:', error);
+        setErro('Erro ao buscar usuários.');
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -36,7 +43,7 @@ const ListaUsuarios = () => {
   }, [mostrarPrestadores]);
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box p={3}>
       <Typography variant="h4" gutterBottom>
         {mostrarPrestadores ? 'Prestadores de Serviço' : 'Todos os Usuários'}
       </Typography>
@@ -49,38 +56,53 @@ const ListaUsuarios = () => {
         {mostrarPrestadores ? 'Mostrar Todos' : 'Mostrar Apenas Prestadores'}
       </Button>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Nome</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Tipo</TableCell>
-              <TableCell>Ações</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {usuarios.map((usuario) => (
-              <TableRow key={usuario.id}>
-                <TableCell>{usuario.nome}</TableCell>
-                <TableCell>{usuario.email}</TableCell>
-                <TableCell>
-                  {usuario.ofereceServico ? 'Prestador' : 'Usuário'}
-                </TableCell>
-                <TableCell>
-                  <Button
-                    component={Link}
-                    to={`/usuarios/${usuario.id}`}
-                    size="small"
-                  >
-                    Ver Detalhes
-                  </Button>
-                </TableCell>
+      {loading ? (
+        <Box textAlign="center" mt={4}>
+          <CircularProgress />
+        </Box>
+      ) : erro ? (
+        <Alert severity="error">{erro}</Alert>
+      ) : (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Nome</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Tipo</TableCell>
+                <TableCell>Ações</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {usuarios.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} align="center">
+                    Nenhum usuário encontrado.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                usuarios.map((usuario) => (
+                  <TableRow key={usuario.id}>
+                    <TableCell>{usuario.nome}</TableCell>
+                    <TableCell>{usuario.email}</TableCell>
+                    <TableCell>{usuario.ofereceServico ? 'Prestador' : 'Usuário'}</TableCell>
+                    <TableCell>
+                      <Button
+                        component={Link}
+                        to={`/usuarios/${usuario.id}`}
+                        size="small"
+                        variant="outlined"
+                      >
+                        Ver Detalhes
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
     </Box>
   );
 };

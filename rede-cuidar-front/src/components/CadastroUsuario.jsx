@@ -15,7 +15,9 @@ import {
   Box,
   Alert,
   InputAdornment,
-  IconButton
+  IconButton,
+  Paper,
+  Divider
 } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -110,155 +112,185 @@ const CadastroUsuario = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 800, margin: 'auto', p: 3, minHeight: '80vh' }}>
-      <Typography variant="h4" gutterBottom sx={{ textAlign: 'center', mb: 4 }}>
-        Cadastro de Usuário
-      </Typography>
+    <Box sx={{ maxWidth: 800, mx: 'auto', py: 5 }}>
+      <Paper elevation={3} sx={{ p: 4 }}>
+        <Typography variant="h4" textAlign="center" gutterBottom fontWeight={600}>
+          Cadastro de Usuário
+        </Typography>
 
-      {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
+        {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
 
-      <Formik
-        initialValues={{
-          nome: '',
-          email: '',
-          senha: '',
-          telefone: '',
-          cep: '',
-          bairro: '',
-          cidade: '',
-          estado: '',
-          ofereceServico: false,
-          especialidade: '',
-          descricaoServico: '',
-          fotoPerfil: null
-        }}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
-      >
-        {({ values, errors, touched, handleChange, setFieldValue }) => (
-          <Form style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <Field as={TextField} name="nome" label="Nome Completo" fullWidth error={touched.nome && !!errors.nome} helperText={touched.nome && errors.nome} />
-            <Field as={TextField} name="email" label="Email" type="email" fullWidth error={touched.email && !!errors.email} helperText={touched.email && errors.email} />
+        <Formik
+          initialValues={{
+            nome: '',
+            email: '',
+            senha: '',
+            telefone: '',
+            cep: '',
+            bairro: '',
+            cidade: '',
+            estado: '',
+            ofereceServico: false,
+            especialidade: '',
+            descricaoServico: '',
+            fotoPerfil: null
+          }}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
+        >
+          {({ values, errors, touched, handleChange, setFieldValue }) => (
+            <Form>
+              <Typography variant="h6" gutterBottom>Dados Pessoais</Typography>
+              <Divider sx={{ mb: 2 }} />
 
-            <Field
-              as={TextField}
-              name="senha"
-              label="Senha"
-              type={showPassword ? 'text' : 'password'}
-              fullWidth
-              error={touched.senha && !!errors.senha}
-              helperText={touched.senha && errors.senha}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={() => setShowPassword((prev) => !prev)} edge="end">
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                )
-              }}
-            />
+              <Field as={TextField} name="nome" label="Nome Completo" fullWidth margin="normal" error={touched.nome && !!errors.nome} helperText={touched.nome && errors.nome} />
+              <Field as={TextField} name="email" label="Email" type="email" fullWidth margin="normal" error={touched.email && !!errors.email} helperText={touched.email && errors.email} />
 
-            <Field as={TextField} name="telefone" label="Telefone" fullWidth error={touched.telefone && !!errors.telefone} helperText={touched.telefone && errors.telefone} />
+              <Field
+                as={TextField}
+                name="senha"
+                label="Senha"
+                type={showPassword ? 'text' : 'password'}
+                fullWidth
+                margin="normal"
+                error={touched.senha && !!errors.senha}
+                helperText={touched.senha && errors.senha}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => setShowPassword(prev => !prev)} edge="end">
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+              />
 
-            <Field
-              as={TextField}
-              name="cep"
-              label="CEP"
-              fullWidth
-              error={touched.cep && !!errors.cep}
-              helperText={touched.cep && errors.cep}
-              onChange={(e) => {
-                const cep = e.target.value.replace(/\D/g, '');
-                setFieldValue('cep', cep);
-                if (cep.length === 8) {
-                  fetch(`https://viacep.com.br/ws/${cep}/json/`)
-                    .then(res => res.json())
-                    .then(data => {
-                      if (!data.erro) {
-                        setFieldValue('bairro', data.bairro);
-                        setFieldValue('cidade', data.localidade);
-                        setFieldValue('estado', data.uf);
-                      }
-                    });
-                }
-              }}
-            />
+              <Field as={TextField} name="telefone" label="Telefone" fullWidth margin="normal" error={touched.telefone && !!errors.telefone} helperText={touched.telefone && errors.telefone} />
 
-            <Field as={TextField} name="bairro" label="Bairro" fullWidth error={touched.bairro && !!errors.bairro} helperText={touched.bairro && errors.bairro} />
-            <Field as={TextField} name="cidade" label="Cidade" fullWidth error={touched.cidade && !!errors.cidade} helperText={touched.cidade && errors.cidade} />
-            <Field as={TextField} name="estado" label="Estado" fullWidth error={touched.estado && !!errors.estado} helperText={touched.estado && errors.estado} />
+              <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>Endereço</Typography>
+              <Divider sx={{ mb: 2 }} />
 
-            <input
-              type="file"
-              name="fotoPerfil"
-              accept="image/*"
-              onChange={(event) => {
-                const file = event.currentTarget.files[0];
-                setFieldValue("fotoPerfil", file);
-              }}
-            />
+              <Field
+                as={TextField}
+                name="cep"
+                label="CEP"
+                fullWidth
+                margin="normal"
+                error={touched.cep && !!errors.cep}
+                helperText={touched.cep && errors.cep}
+                onChange={(e) => {
+                  const cep = e.target.value.replace(/\D/g, '');
+                  setFieldValue('cep', cep);
+                  if (cep.length === 8) {
+                    fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                      .then(res => res.json())
+                      .then(data => {
+                        if (!data.erro) {
+                          setFieldValue('bairro', data.bairro);
+                          setFieldValue('cidade', data.localidade);
+                          setFieldValue('estado', data.uf);
+                        }
+                      });
+                  }
+                }}
+              />
 
-            <FormControlLabel
-              control={
-                <Checkbox
-                  name="ofereceServico"
-                  checked={values.ofereceServico}
-                  onChange={handleChange}
+              <Field as={TextField} name="bairro" label="Bairro" fullWidth margin="normal" error={touched.bairro && !!errors.bairro} helperText={touched.bairro && errors.bairro} />
+              <Field as={TextField} name="cidade" label="Cidade" fullWidth margin="normal" error={touched.cidade && !!errors.cidade} helperText={touched.cidade && errors.cidade} />
+              <Field as={TextField} name="estado" label="Estado" fullWidth margin="normal" error={touched.estado && !!errors.estado} helperText={touched.estado && errors.estado} />
+
+              <Box sx={{ mt: 3 }}>
+                <InputLabel>Foto de Perfil</InputLabel>
+                <input
+                  type="file"
+                  name="fotoPerfil"
+                  accept="image/*"
+                  onChange={(event) => {
+                    const file = event.currentTarget.files[0];
+                    setFieldValue("fotoPerfil", file);
+                  }}
+                  style={{ marginTop: '8px' }}
                 />
-              }
-              label="Ofereço serviços de cuidado"
-            />
+              </Box>
 
-            {values.ofereceServico && (
-              <>
-                <FormControl fullWidth>
-                  <InputLabel>Especialidade</InputLabel>
-                  <Field
-                    as={Select}
-                    name="especialidade"
-                    label="Especialidade"
-                    error={touched.especialidade && !!errors.especialidade}
+              <FormControlLabel
+                sx={{ mt: 3 }}
+                control={
+                  <Checkbox
+                    name="ofereceServico"
+                    checked={values.ofereceServico}
                     onChange={handleChange}
-                    value={values.especialidade}
-                  >
-                    {Object.entries(Especialidade).map(([key, value]) => (
-                      <MenuItem key={value} value={value}>
-                        {key.toLowerCase().replace(/_/g, ' ')}
-                      </MenuItem>
-                    ))}
-                  </Field>
-                </FormControl>
+                  />
+                }
+                label="Ofereço serviços de cuidado"
+              />
 
-                <Field
-                  as={TextField}
-                  name="descricaoServico"
-                  label="Descrição do Serviço"
-                  multiline
-                  rows={4}
-                  fullWidth
-                  error={touched.descricaoServico && !!errors.descricaoServico}
-                  helperText={touched.descricaoServico && errors.descricaoServico}
+              {values.ofereceServico && (
+                <>
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel>Especialidade</InputLabel>
+                    <Field
+                      as={Select}
+                      name="especialidade"
+                      label="Especialidade"
+                      value={values.especialidade}
+                      onChange={handleChange}
+                      error={touched.especialidade && !!errors.especialidade}
+                    >
+                      {Object.entries(Especialidade).map(([key, value]) => (
+                        <MenuItem key={value} value={value}>
+                          {key.toLowerCase().replace(/_/g, ' ')}
+                        </MenuItem>
+                      ))}
+                    </Field>
+                  </FormControl>
+
+                  <Field
+                    as={TextField}
+                    name="descricaoServico"
+                    label="Descrição do Serviço"
+                    multiline
+                    rows={4}
+                    fullWidth
+                    margin="normal"
+                    error={touched.descricaoServico && !!errors.descricaoServico}
+                    helperText={touched.descricaoServico && errors.descricaoServico}
+                  />
+                </>
+              )}
+
+              <Box sx={{ my: 3, display: 'flex', justifyContent: 'center' }}>
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
                 />
-              </>
-            )}
+              </Box>
 
-            <Box sx={{ my: 2, display: 'flex', justifyContent: 'center' }}>
-               <ReCAPTCHA
-                 ref={recaptchaRef}
-                 sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                <Button
+                  type="submit"
+                  variant="contained"
+                  fullWidth
+                  size="large"
+                  sx={{
+                    mt: 2,
+                    borderRadius: 2,
+                    backgroundColor: '#1976d2',
+                    color: '#fff',
+                    '&:hover': {
+                      backgroundColor: '#1565c0',
+                    },
+                  }}
+                >
+                  Cadastrar
+                </Button>
 
-               />
 
 
-            </Box>
-
-            <Button type="submit" variant="contained" color="primary" fullWidth size="large">
-              Cadastrar
-            </Button>
-          </Form>
-        )}
-      </Formik>
+            </Form>
+          )}
+        </Formik>
+      </Paper>
     </Box>
   );
 };

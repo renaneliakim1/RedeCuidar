@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -14,11 +14,53 @@ import {
   Grid,
   CircularProgress,
   Alert,
-  Avatar
+  Avatar,
 } from '@mui/material';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { getUsuario, updateUsuario } from '../services/usuarioService';
+
+const gruposOptions = [
+  { value: 'MULHER', label: 'Mulher' },
+  { value: 'PCD', label: 'Pessoa com Deficiência' },
+  { value: 'INDIGENA', label: 'Indígena' },
+  { value: 'LGBTQIA+', label: 'LGBTQIA+' },
+  { value: 'REFUGIADO', label: 'Refugiado' },
+  { value: 'IDOSO', label: 'Idoso' },
+  { value: 'OUTRO', label: 'Outro' },
+];
+
+const especialidadesOptions = [
+  { value: 'CUIDADOR', label: 'Cuidador' },
+  { value: 'BABA', label: 'Babá' },
+  { value: 'ENFERMEIRO', label: 'Enfermeiro' },
+  { value: 'FISIOTERAPEUTA', label: 'Fisioterapeuta' },
+  { value: 'MEDICO', label: 'Médico' },
+  { value: 'PSICOLOGO', label: 'Psicólogo' },
+  { value: 'NUTRICIONISTA', label: 'Nutricionista' },
+  { value: 'OUTRO', label: 'Outro' },
+];
+
+const validationSchema = Yup.object().shape({
+  nome: Yup.string().required('Nome é obrigatório'),
+  email: Yup.string().email('Email inválido').required('Email é obrigatório'),
+  telefone: Yup.string().required('Telefone é obrigatório'),
+  endereco: Yup.string().required('Endereço é obrigatório'),
+  cep: Yup.string().required('CEP é obrigatório').length(8, 'CEP deve ter 8 dígitos'),
+  bairro: Yup.string().required('Bairro é obrigatório'),
+  cidade: Yup.string().required('Cidade é obrigatória'),
+  estado: Yup.string().required('Estado é obrigatório'),
+  especialidade: Yup.string().when('ofereceServico', {
+    is: true,
+    then: Yup.string().required('Especialidade é obrigatória para prestadores'),
+    otherwise: Yup.string().nullable(),
+  }),
+  descricaoServico: Yup.string().when('ofereceServico', {
+    is: true,
+    then: Yup.string().required('Descrição do serviço é obrigatória'),
+    otherwise: Yup.string().nullable(),
+  }),
+});
 
 const EditarUsuario = () => {
   const { id } = useParams();
@@ -27,47 +69,6 @@ const EditarUsuario = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [preview, setPreview] = useState(null);
-
-  const gruposOptions = [
-    { value: 'MULHER', label: 'Mulher' },
-    { value: 'PCD', label: 'Pessoa com Deficiência' },
-    { value: 'INDIGENA', label: 'Indígena' },
-    { value: 'LGBTQIA+', label: 'LGBTQIA+' },
-    { value: 'REFUGIADO', label: 'Refugiado' },
-    { value: 'IDOSO', label: 'Idoso' },
-    { value: 'OUTRO', label: 'Outro' },
-  ];
-
-  const especialidadesOptions = [
-    { value: 'CUIDADOR', label: 'Cuidador' },
-    { value: 'BABA', label: 'Babá' },
-    { value: 'ENFERMEIRO', label: 'Enfermeiro' },
-    { value: 'FISIOTERAPEUTA', label: 'Fisioterapeuta' },
-    { value: 'MEDICO', label: 'Médico' },
-    { value: 'PSICOLOGO', label: 'Psicólogo' },
-    { value: 'NUTRICIONISTA', label: 'Nutricionista' },
-    { value: 'OUTRO', label: 'Outro' },
-  ];
-
-  const validationSchema = Yup.object().shape({
-    nome: Yup.string().required('Nome é obrigatório'),
-    email: Yup.string().email('Email inválido').required('Email é obrigatório'),
-    telefone: Yup.string().required('Telefone é obrigatório'),
-    endereco: Yup.string().required('Endereço é obrigatório'),
-    cep: Yup.string().required('CEP é obrigatório').length(8, 'CEP deve ter 8 dígitos'),
-    bairro: Yup.string().required('Bairro é obrigatório'),
-    cidade: Yup.string().required('Cidade é obrigatória'),
-    estado: Yup.string().required('Estado é obrigatório'),
-
-    especialidade: Yup.string().when('ofereceServico', {
-      is: true,
-      then: Yup.string().required('Especialidade é obrigatória para prestadores'),
-    }),
-    descricaoServico: Yup.string().when('ofereceServico', {
-      is: true,
-      then: Yup.string().required('Descrição do serviço é obrigatória'),
-    }),
-  });
 
   useEffect(() => {
     const fetchUsuario = async () => {
@@ -79,6 +80,7 @@ const EditarUsuario = () => {
         }
       } catch (error) {
         console.error('Erro ao carregar usuário:', error);
+        setError('Erro ao carregar usuário');
       } finally {
         setLoading(false);
       }
@@ -90,12 +92,15 @@ const EditarUsuario = () => {
     try {
       const formData = new FormData();
 
-      // Dados JSON do usuário (exceto a foto)
       const usuarioData = {
         nome: values.nome,
         email: values.email,
         telefone: values.telefone,
         endereco: values.endereco,
+        cep: values.cep,
+        bairro: values.bairro,
+        cidade: values.cidade,
+        estado: values.estado,
         ofereceServico: values.ofereceServico,
         especialidade: values.ofereceServico ? values.especialidade : null,
         descricaoServico: values.ofereceServico ? values.descricaoServico : null,
@@ -104,13 +109,11 @@ const EditarUsuario = () => {
 
       formData.append('usuario', new Blob([JSON.stringify(usuarioData)], { type: 'application/json' }));
 
-      // Se o usuário escolheu nova foto, anexa ao formData
       if (values.fotoPerfil instanceof File) {
         formData.append('foto', values.fotoPerfil);
       }
 
       await updateUsuario(id, formData);
-
       navigate('/usuarios');
     } catch (err) {
       setError('Erro ao atualizar usuário');
@@ -154,238 +157,206 @@ const EditarUsuario = () => {
           email: usuario.email,
           telefone: usuario.telefone,
           endereco: usuario.endereco,
-          cep: usuario.cep || '',
-          bairro: usuario.bairro || '',
-          cidade: usuario.cidade || '',
-          estado: usuario.estado || '',
-          ofereceServico: usuario.ofereceServico,
+          cep: usuario.cep,
+          bairro: usuario.bairro,
+          cidade: usuario.cidade,
+          estado: usuario.estado,
+          ofereceServico: usuario.ofereceServico || false,
           especialidade: usuario.especialidade || '',
           descricaoServico: usuario.descricaoServico || '',
           gruposVulneraveis: usuario.gruposVulneraveis || [],
           fotoPerfil: null,
         }}
-
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ values, errors, touched, setFieldValue }) => (
+        {({ values, setFieldValue, isSubmitting }) => (
           <Form>
             <Grid container spacing={2}>
-              {/* Campos textuais */}
-              <Grid item xs={12}>
+              <Grid item xs={12} sm={6}>
                 <Field
                   as={TextField}
+                  fullWidth
+                  label="Nome"
                   name="nome"
-                  label="Nome Completo"
-                  fullWidth
-                  error={touched.nome && !!errors.nome}
-                  helperText={touched.nome && errors.nome}
+                  variant="outlined"
+                  helperText={<ErrorMessage name="nome" />}
+                  error={Boolean(values.nome === '' && 'nome')}
                 />
               </Grid>
 
               <Grid item xs={12} sm={6}>
                 <Field
                   as={TextField}
-                  name="email"
+                  fullWidth
                   label="Email"
+                  name="email"
                   type="email"
-                  fullWidth
-                  disabled
-                  error={touched.email && !!errors.email}
-                  helperText={touched.email && errors.email}
+                  variant="outlined"
+                  helperText={<ErrorMessage name="email" />}
+                  error={Boolean(values.email === '' && 'email')}
                 />
               </Grid>
 
               <Grid item xs={12} sm={6}>
                 <Field
                   as={TextField}
-                  name="telefone"
-                  label="Telefone"
                   fullWidth
-                  error={touched.telefone && !!errors.telefone}
-                  helperText={touched.telefone && errors.telefone}
+                  label="Telefone"
+                  name="telefone"
+                  variant="outlined"
+                  helperText={<ErrorMessage name="telefone" />}
+                  error={Boolean(values.telefone === '' && 'telefone')}
                 />
               </Grid>
 
-             <Grid item xs={12}>
-               <Field
-                 as={TextField}
-                 name="cep"
-                 label="CEP"
-                 fullWidth
-                 error={touched.cep && !!errors.cep}
-                 helperText={touched.cep && errors.cep}
-                 onChange={(e) => {
-                   const cep = e.target.value.replace(/\D/g, '');
-                   setFieldValue('cep', cep);
-
-                   if (cep.length === 8) {
-                     fetch(`https://viacep.com.br/ws/${cep}/json/`)
-                       .then(res => res.json())
-                       .then(data => {
-                         if (!data.erro) {
-                           setFieldValue('bairro', data.bairro);
-                           setFieldValue('cidade', data.localidade);
-                           setFieldValue('estado', data.uf);
-                         }
-                       });
-                   }
-                 }}
-               />
-             </Grid>
-
-             <Grid item xs={12} sm={6}>
-               <Field
-                 as={TextField}
-                 name="bairro"
-                 label="Bairro"
-                 fullWidth
-                 error={touched.bairro && !!errors.bairro}
-                 helperText={touched.bairro && errors.bairro}
-               />
-             </Grid>
-
-             <Grid item xs={12} sm={6}>
-               <Field
-                 as={TextField}
-                 name="cidade"
-                 label="Cidade"
-                 fullWidth
-                 error={touched.cidade && !!errors.cidade}
-                 helperText={touched.cidade && errors.cidade}
-               />
-             </Grid>
-
-             <Grid item xs={12} sm={6}>
-               <Field
-                 as={TextField}
-                 name="estado"
-                 label="Estado"
-                 fullWidth
-                 error={touched.estado && !!errors.estado}
-                 helperText={touched.estado && errors.estado}
-               />
-             </Grid>
-
-             <Grid item xs={12}>
-               <Field
-                 as={TextField}
-                 name="endereco"
-                 label="Endereço Completo"
-                 fullWidth
-                 error={touched.endereco && !!errors.endereco}
-                 helperText={touched.endereco && errors.endereco}
-               />
-             </Grid>
-
-
-              {/* Grupos vulneráveis */}
-              <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel>Grupos Vulneráveis</InputLabel>
-                  <Field
-                    as={Select}
-                    name="gruposVulneraveis"
-                    multiple
-                    label="Grupos Vulneráveis"
-                    renderValue={(selected) =>
-                      selected
-                        .map((value) => gruposOptions.find((opt) => opt.value === value)?.label)
-                        .join(', ')
-                    }
-                  >
-                    {gruposOptions.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </Field>
-                </FormControl>
+              <Grid item xs={12} sm={6}>
+                <Field
+                  as={TextField}
+                  fullWidth
+                  label="CEP"
+                  name="cep"
+                  variant="outlined"
+                  helperText={<ErrorMessage name="cep" />}
+                  error={Boolean(values.cep === '' && 'cep')}
+                />
               </Grid>
 
-              {/* Checkbox oferece serviço */}
+              <Grid item xs={12} sm={6}>
+                <Field
+                  as={TextField}
+                  fullWidth
+                  label="Bairro"
+                  name="bairro"
+                  variant="outlined"
+                  helperText={<ErrorMessage name="bairro" />}
+                  error={Boolean(values.bairro === '' && 'bairro')}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <Field
+                  as={TextField}
+                  fullWidth
+                  label="Cidade"
+                  name="cidade"
+                  variant="outlined"
+                  helperText={<ErrorMessage name="cidade" />}
+                  error={Boolean(values.cidade === '' && 'cidade')}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <Field
+                  as={TextField}
+                  fullWidth
+                  label="Estado"
+                  name="estado"
+                  variant="outlined"
+                  helperText={<ErrorMessage name="estado" />}
+                  error={Boolean(values.estado === '' && 'estado')}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <Field
+                  as={TextField}
+                  fullWidth
+                  label="Endereço"
+                  name="endereco"
+                  variant="outlined"
+                  helperText={<ErrorMessage name="endereco" />}
+                  error={Boolean(values.endereco === '' && 'endereco')}
+                />
+              </Grid>
+
               <Grid item xs={12}>
                 <FormControlLabel
-                  control={<Field as={Checkbox} name="ofereceServico" type="checkbox" />}
-                  label="Oferece serviço?"
+                  control={
+                    <Checkbox
+                      checked={values.ofereceServico}
+                      onChange={() => setFieldValue('ofereceServico', !values.ofereceServico)}
+                    />
+                  }
+                  label="Oferece serviços"
                 />
               </Grid>
 
-              {/* Especialidade e descrição */}
               {values.ofereceServico && (
                 <>
                   <Grid item xs={12} sm={6}>
                     <FormControl fullWidth>
-                      <InputLabel>Especialidade</InputLabel>
-                      <Field
-                        as={Select}
-                        name="especialidade"
+                      <InputLabel id="especialidade-label">Especialidade</InputLabel>
+                      <Select
+                        labelId="especialidade-label"
                         label="Especialidade"
-                        error={touched.especialidade && !!errors.especialidade}
+                        name="especialidade"
+                        value={values.especialidade}
+                        onChange={(e) => setFieldValue('especialidade', e.target.value)}
                       >
                         {especialidadesOptions.map((option) => (
                           <MenuItem key={option.value} value={option.value}>
                             {option.label}
                           </MenuItem>
                         ))}
-                      </Field>
-                      <ErrorMessage name="especialidade" component="div" style={{ color: 'red' }} />
+                      </Select>
                     </FormControl>
+                    <ErrorMessage
+                      name="especialidade"
+                      component="div"
+                      style={{ color: 'red', fontSize: 12 }}
+                    />
                   </Grid>
 
-                  <Grid item xs={12} sm={6}>
+                  <Grid item xs={12}>
                     <Field
                       as={TextField}
-                      name="descricaoServico"
-                      label="Descrição do Serviço"
+                      fullWidth
                       multiline
                       rows={4}
-                      fullWidth
-                      error={touched.descricaoServico && !!errors.descricaoServico}
-                      helperText={touched.descricaoServico && errors.descricaoServico}
+                      label="Descrição do Serviço"
+                      name="descricaoServico"
+                      variant="outlined"
+                      helperText={<ErrorMessage name="descricaoServico" />}
+                      error={Boolean(values.descricaoServico === '' && 'descricaoServico')}
                     />
                   </Grid>
                 </>
               )}
 
-              {/* Foto de perfil atual e upload nova */}
-              <Grid item xs={12}>
-                <Typography>Foto de Perfil Atual:</Typography>
-                <Box sx={{ mb: 2 }}>
-                  <Avatar alt={usuario.nome} src={preview} sx={{ width: 80, height: 80 }} />
-                </Box>
-
-                <Button
-                  variant="contained"
-                  component="label"
-                >
-                  Alterar Foto
+              <Grid item xs={12} sm={6}>
+                <Button variant="contained" component="label">
+                  Upload Foto de Perfil
                   <input
                     type="file"
-                    accept="image/*"
                     hidden
-                    onChange={(event) => {
-                      const file = event.currentTarget.files[0];
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.currentTarget.files[0];
                       setFieldValue('fotoPerfil', file);
                       if (file) {
                         setPreview(URL.createObjectURL(file));
-                      } else {
-                        setPreview(usuario.fotoPerfil ? `http://localhost:8080/uploads/fotos-perfil/${usuario.fotoPerfil}` : null);
                       }
                     }}
                   />
                 </Button>
               </Grid>
 
+              <Grid item xs={12} sm={6}>
+                {preview && (
+                  <Avatar
+                    src={preview}
+                    alt="Preview da foto"
+                    sx={{ width: 100, height: 100 }}
+                    variant="rounded"
+                  />
+                )}
+              </Grid>
 
-              {/* Botões */}
               <Grid item xs={12}>
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                  <Button type="submit" variant="contained" color="primary">
-                    Salvar Alterações
-                  </Button>
-                  <Button variant="outlined" onClick={() => navigate('/usuarios')}>
-                    Cancelar
+                <Box sx={{ mt: 2 }}>
+                  <Button type="submit" variant="contained" disabled={isSubmitting}>
+                    {isSubmitting ? 'Salvando...' : 'Salvar'}
                   </Button>
                 </Box>
               </Grid>

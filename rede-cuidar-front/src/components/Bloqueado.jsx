@@ -2,9 +2,8 @@ import { Box, Typography, Button, Container } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 
-
 const Bloqueado = () => {
-    const theme = useTheme();
+  const theme = useTheme();
 
   return (
     <Container maxWidth="sm" sx={{ mt: 8, textAlign: 'center' }}>
@@ -21,10 +20,9 @@ const Bloqueado = () => {
           px: 2,
           borderRadius: 2,
           boxShadow: 3,
-          mt: 8
+          mt: 8,
         }}
       >
-
         <Typography variant="h5" gutterBottom>
           🤔 Hmm... parece que você ainda não entrou!
         </Typography>
@@ -33,11 +31,44 @@ const Bloqueado = () => {
           É rapidinho e gratuito 😁
         </Typography>
 
-        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
-          <Button variant="contained" color="primary" component={Link} to="/login">
+        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, width: '100%' }}>
+          <Button
+            variant="contained"
+            component={Link}
+            to="/login"
+            fullWidth
+            size="large"
+            sx={{
+              backgroundColor: '#1976d2',
+              borderRadius: 2,
+              color: '#fff',
+              textTransform: 'none',
+              '&:hover': {
+                backgroundColor: '#1565c0',
+              },
+            }}
+          >
             Entrar
           </Button>
-          <Button variant="outlined" color="primary" component={Link} to="/cadastro">
+
+          <Button
+            variant="outlined"
+            component={Link}
+            to="/cadastro"
+            fullWidth
+            size="large"
+            sx={{
+              borderRadius: 2,
+              textTransform: 'none',
+              color: '#1976d2',
+              borderColor: '#1976d2',
+              '&:hover': {
+                backgroundColor: '#e3f2fd',
+                borderColor: '#1565c0',
+                color: '#1565c0',
+              },
+            }}
+          >
             Cadastrar-se
           </Button>
         </Box>

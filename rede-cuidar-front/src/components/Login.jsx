@@ -10,8 +10,10 @@ import {
   Container,
   CircularProgress,
   InputAdornment,
-  IconButton
+  IconButton,
+  Paper
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import ReCAPTCHA from 'react-google-recaptcha';
@@ -19,6 +21,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 const Login = () => {
+  const theme = useTheme();
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -50,9 +53,7 @@ const Login = () => {
       const response = await fetch('http://localhost:8080/api/auth/login', {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: formData.toString(),
       });
 
@@ -74,10 +75,38 @@ const Login = () => {
     }
   };
 
+  const textFieldStyles = {
+    backgroundColor: theme.palette.mode === 'dark' ? '#333' : '#fff',
+    input: {
+      color: theme.palette.mode === 'dark' ? '#fff' : '#000',
+    },
+    '& input::placeholder': {
+      color: theme.palette.mode === 'dark' ? '#bbb' : '#888',
+      opacity: 1,
+    },
+    '& .MuiInputLabel-root': {
+      color: theme.palette.mode === 'dark' ? '#bbb' : undefined,
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+      color: theme.palette.mode === 'dark' ? '#90caf9' : undefined,
+    },
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+        borderColor: theme.palette.mode === 'dark' ? '#555' : undefined,
+      },
+      '&:hover fieldset': {
+        borderColor: theme.palette.mode === 'dark' ? '#888' : undefined,
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: theme.palette.mode === 'dark' ? '#90caf9' : undefined,
+      },
+    },
+  };
+
   return (
     <Container maxWidth="sm">
-      <Box sx={{ mt: 8, p: 4, boxShadow: 3, borderRadius: 2 }}>
-        <Typography variant="h4" align="center" gutterBottom>
+      <Paper elevation={4} sx={{ mt: 8, p: 4, borderRadius: 3, backgroundColor: 'background.paper' }}>
+        <Typography variant="h4" align="center" gutterBottom fontWeight={600}>
           Login
         </Typography>
 
@@ -104,6 +133,7 @@ const Login = () => {
                 onBlur={handleBlur}
                 error={touched.email && !!errors.email}
                 helperText={touched.email && errors.email}
+                sx={textFieldStyles}
               />
 
               <TextField
@@ -117,13 +147,11 @@ const Login = () => {
                 onBlur={handleBlur}
                 error={touched.senha && !!errors.senha}
                 helperText={touched.senha && errors.senha}
+                sx={textFieldStyles}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowPassword((prev) => !prev)}
-                        edge="end"
-                      >
+                      <IconButton onClick={() => setShowPassword((prev) => !prev)} edge="end" aria-label="toggle password visibility">
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
@@ -131,22 +159,19 @@ const Login = () => {
                 }}
               />
 
-             <Box sx={{ my: 2, display: 'flex', justifyContent: 'center' }}>
-               <ReCAPTCHA
-                 ref={recaptchaRef}
-                 sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
-
-               />
-
-
-             </Box>
+              <Box sx={{ my: 2, display: 'flex', justifyContent: 'center' }}>
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                />
+              </Box>
 
               <Button
                 type="submit"
                 variant="contained"
                 fullWidth
                 size="large"
-                sx={{ mt: 3 }}
+                sx={{ mt: 2, borderRadius: 2, backgroundColor: '#1976d2', '&:hover': { backgroundColor: '#1565c0' } }}
                 disabled={loading}
               >
                 {loading ? <CircularProgress size={24} /> : 'Entrar'}
@@ -160,7 +185,7 @@ const Login = () => {
             Não tem uma conta? Registre-se
           </Link>
         </Box>
-      </Box>
+      </Paper>
     </Container>
   );
 };
