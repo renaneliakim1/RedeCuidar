@@ -1,81 +1,69 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
-  Box, Typography, Button, Container, Card, CardContent, Avatar,
-  IconButton
+  Box, Typography, Button, Container, Avatar,
+  IconButton, Grid, Card, CardMedia, CardContent
 } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
-
 import Slider from "react-slick";
-
-// Ícones para as setas do carrossel
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-
-// CSS do slick-carousel
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { useNavigate } from 'react-router-dom';
+import Typed from 'typed.js';
 
+import cuidados from '../assets/cuidados.jpg';
+import saudemental from '../assets/saudemental.jpg';
+import educacao from '../assets/educacao.jpg';
+import fisioterapia from '../assets/fisioterapia.jpg';
 
-// Setas azuis customizadas para o react-slick
-const BluePrevArrow = (props) => {
-  const { onClick } = props;
-  return (
-    <IconButton
-      onClick={onClick}
-      sx={{
-        color: '#1976d2',
-        position: 'absolute',
-        top: '50%',
-        left: 0,
-        transform: 'translate(0, -50%)',
-        zIndex: 1,
-        backgroundColor: 'rgba(255,255,255,0.7)',
-        '&:hover': { backgroundColor: 'rgba(255,255,255,0.9)' }
-      }}
-      aria-label="previous"
-    >
-      <ArrowBackIosIcon />
-    </IconButton>
-  );
-};
+const BluePrevArrow = (props) => (
+  <IconButton onClick={props.onClick} sx={{
+    color: '#0d47a1', position: 'absolute', top: '50%', left: 0,
+    transform: 'translate(0, -50%)', zIndex: 1,
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    '&:hover': { backgroundColor: 'rgba(255,255,255,0.9)' }
+  }}>
+    <ArrowBackIosIcon />
+  </IconButton>
+);
 
-const BlueNextArrow = (props) => {
-  const { onClick } = props;
-  return (
-    <IconButton
-      onClick={onClick}
-      sx={{
-        color: '#1976d2',
-        position: 'absolute',
-        top: '50%',
-        right: 0,
-        transform: 'translate(0, -50%)',
-        zIndex: 1,
-        backgroundColor: 'rgba(255,255,255,0.7)',
-        '&:hover': { backgroundColor: 'rgba(255,255,255,0.9)' }
-      }}
-      aria-label="next"
-    >
-      <ArrowForwardIosIcon />
-    </IconButton>
-  );
-};
+const BlueNextArrow = (props) => (
+  <IconButton onClick={props.onClick} sx={{
+    color: '#0d47a1', position: 'absolute', top: '50%', right: 0,
+    transform: 'translate(0, -50%)', zIndex: 1,
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    '&:hover': { backgroundColor: 'rgba(255,255,255,0.9)' }
+  }}>
+    <ArrowForwardIosIcon />
+  </IconButton>
+);
 
 const Home = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [prestadores, setPrestadores] = useState([]);
   const navigate = useNavigate();
+  const typedEl = useRef(null);
 
   useEffect(() => {
-    const logado = localStorage.getItem('token') === 'logado';
-    setIsLoggedIn(logado);
+    const typed = new Typed(typedEl.current, {
+      strings: [
+        `<div class="typed-title">Rede Cuidar</div>
+         <div class="typed-subtitle">Conectando quem precisa de cuidados com quem pode oferecer.</div>`
+      ],
+      typeSpeed: 40,
+      showCursor: true,
+      cursorChar: '|',
+      loop: false
+    });
 
-    const handleAuthChange = () => {
-      setIsLoggedIn(localStorage.getItem('token') === 'logado');
-    };
+    return () => typed.destroy();
+  }, []);
+
+  useEffect(() => {
+    setIsLoggedIn(localStorage.getItem('token') === 'logado');
+    const handleAuthChange = () => setIsLoggedIn(localStorage.getItem('token') === 'logado');
     window.addEventListener('authChange', handleAuthChange);
     return () => window.removeEventListener('authChange', handleAuthChange);
   }, []);
@@ -84,12 +72,11 @@ const Home = () => {
     const fetchPrestadores = async () => {
       try {
         const response = await axios.get("http://localhost:8080/usuarios/oferecendo-servicos");
-        setPrestadores(response.data.slice(0, 6)); // mostra no máximo 6
+        setPrestadores(response.data.slice(0, 6));
       } catch (error) {
         console.error("Erro ao buscar prestadores:", error);
       }
     };
-
     fetchPrestadores();
   }, []);
 
@@ -109,61 +96,40 @@ const Home = () => {
     nextArrow: <BlueNextArrow />,
     prevArrow: <BluePrevArrow />,
     responsive: [
-      {
-        breakpoint: 960,
-        settings: { slidesToShow: 2 }
-      },
-      {
-        breakpoint: 600,
-        settings: { slidesToShow: 1 }
-      }
+      { breakpoint: 960, settings: { slidesToShow: 2 } },
+      { breakpoint: 600, settings: { slidesToShow: 1 } }
     ]
   };
 
   return (
     <Container maxWidth="lg">
-      <Box sx={{ my: 6, textAlign: 'center' }}>
-        <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 2 }}>
-          Bem-vindo ao <span style={{ color: '#1976d2' }}>Rede Cuidar</span>
-        </Typography>
-        <Typography variant="h6" color="text.secondary">
-          Conectando quem precisa de cuidados com quem pode oferecer
+      <Box sx={{ textAlign: 'center', mt: 6, mb: 4 }}>
+        <Typography
+          component="div"
+          sx={{
+            fontFamily: 'One Krona Text, sans-serif',
+            fontWeight: 700,
+            display: 'inline-block',
+            minHeight: '5rem'
+          }}>
+          <span ref={typedEl}></span>
         </Typography>
 
-        <Box sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 2, mt: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 2, mt: 6 }}>
           {!isLoggedIn && (
-            <Button
-              variant="contained"
-              size="large"
-              component={Link}
-              to="/cadastro"
-              sx={{
-                backgroundColor: '#1976d2',
-                borderRadius: '50px',
-                px: 4,
-                '&:hover': { backgroundColor: '#1565c0' }
-              }}
-            >
-              Cadastre-se
-            </Button>
+            <Button variant="contained" size="large" component={Link} to="/cadastro" sx={{
+              backgroundColor: '#0d47a1', borderRadius: '50px', px: 4,
+              '&:hover': { backgroundColor: '#08306b' }
+            }}>Cadastre-se</Button>
           )}
-
-          <Button
-            variant="outlined"
-            size="large"
+          <Button variant="outlined" size="large"
             onClick={() => navigate(isLoggedIn ? '/servicos' : '/bloqueado')}
             sx={{
-              borderColor: '#1976d2',
-              color: '#1976d2',
-              borderRadius: '50px',
-              px: 4,
+              borderColor: '#0d47a1', color: '#0d47a1', borderRadius: '50px', px: 4,
               '&:hover': {
-                backgroundColor: '#e3f2fd',
-                borderColor: '#1565c0',
-                color: '#1565c0',
+                backgroundColor: '#e3f2fd', borderColor: '#08306b', color: '#08306b'
               }
-            }}
-          >
+            }}>
             Encontrar Serviços
           </Button>
         </Box>
@@ -177,58 +143,23 @@ const Home = () => {
         <Slider {...settings}>
           {prestadores.map((usuario) => (
             <Box key={usuario.id} px={1}>
-              <Card
-                sx={{
-                  height: 320,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  borderRadius: 1,
-                  overflow: 'hidden',
-                  boxShadow: 1,
-                  transition: 'transform 0.3s',
-                  '&:hover': { transform: 'scale(1.02)' }
-                }}
-              >
+              <Card sx={{ borderRadius: 2, boxShadow: 3, p: 2 }}>
                 <Avatar
                   src={usuario.fotoPerfil ? `http://localhost:8080/uploads/fotos-perfil/${usuario.fotoPerfil}` : ''}
                   alt={usuario.nome}
-                  sx={{
-                    width: 80,
-                    height: 80,
-                    alignSelf: 'center',
-                    mt: 2,
-                    mb: 1
-                  }}
+                  sx={{ width: 80, height: 80, mx: 'auto', mt: 1 }}
                 />
-                <CardContent sx={{ flexGrow: 1, textAlign: 'center' }}>
-                  <Typography variant="subtitle1" fontWeight="bold" noWrap>
-                    {usuario.nome}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" noWrap>
-                    {usuario.especialidade}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                    {usuario.bairro}, {usuario.cidade} - {usuario.estado}
-                  </Typography>
+                <CardContent sx={{ textAlign: 'center' }}>
+                  <Typography variant="subtitle1" fontWeight="bold">{usuario.nome}</Typography>
+                  <Typography variant="body2" color="text.secondary">{usuario.especialidade}</Typography>
+                  <Typography variant="body2">{usuario.bairro}, {usuario.cidade} - {usuario.estado}</Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ mt: 1, maxHeight: 50, overflow: 'hidden' }}>
                     {usuario.descricaoServico || 'Sem descrição'}
                   </Typography>
                 </CardContent>
-
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', px: 2, pb: 2 }}>
-                  <Button
-                    size="small"
-                    onClick={() => navigate(isLoggedIn ? `/perfil/${usuario.id}` : '/bloqueado')}
-                    sx={{ color: '#1976d2' }}
-                  >
-                    Ver Perfil
-                  </Button>
-                  <IconButton
-                    color="success"
-                    onClick={() => (isLoggedIn ? abrirWhatsapp(usuario.telefone) : navigate('/bloqueado'))}
-                    aria-label="Whatsapp"
-                  >
+                  <Button size="small" onClick={() => navigate(isLoggedIn ? `/perfil/${usuario.id}` : '/bloqueado')} sx={{ color: '#0d47a1' }}>Ver Perfil</Button>
+                  <IconButton color="success" onClick={() => (isLoggedIn ? abrirWhatsapp(usuario.telefone) : navigate('/bloqueado'))}>
                     <WhatsAppIcon />
                   </IconButton>
                 </Box>
@@ -237,8 +168,103 @@ const Home = () => {
           ))}
         </Slider>
       </Box>
-    </Container>
 
+      <Typography variant="h5" sx={{ mt: 10, mb: 4, fontWeight: 600, textAlign: 'center' }}>
+        Áreas de Atuação
+      </Typography>
+
+      <Grid container spacing={4}>
+        {[{
+          titulo: "Cuidados Pessoais",
+          descricao: "Atenção dedicada para idosos, crianças e PCDs, com carinho, responsabilidade e segurança.",
+          imagem: cuidados
+        }, {
+          titulo: "Saúde Mental",
+          descricao: "Psicólogos e terapeutas comprometidos com o bem-estar emocional de cada pessoa.",
+          imagem: saudemental
+        }, {
+          titulo: "Fisioterapia",
+          descricao: "Reabilitação e cuidado com o corpo através de profissionais capacitados.",
+          imagem: fisioterapia
+        }, {
+          titulo: "Educação",
+          descricao: "Professores e tutores dedicados ao reforço escolar e apoio educacional de qualidade.",
+          imagem: educacao
+        }].map((item, index) => (
+          <Grid item xs={12} sm={6} key={index} >
+            <Card sx={{
+              display: 'flex',
+              flexDirection: {
+                xs: 'column',
+                sm: index % 2 === 0 ? 'row' : 'row-reverse'
+              },
+              height: {
+                xs: 'auto',
+                sm: 200
+              },
+              borderRadius: 2,
+              boxShadow: 3,
+              overflow: 'hidden'
+            }}>
+              <CardMedia
+                component="img"
+                image={item.imagem}
+                alt={item.titulo}
+                sx={{
+                  width: {
+                    xs: '100%',
+                    sm: 1200
+                  },
+                  height: {
+                    xs: 160,
+                    sm: '100%'
+                  },
+                  objectFit: 'cover'
+                }}
+              />
+              <CardContent sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                width: '100%',
+                padding: 2
+              }}>
+                <Typography variant="h6" fontWeight={600} gutterBottom>
+                  {item.titulo}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {item.descricao}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+
+      <style>
+        {`
+          .typed-title {
+            font-family: 'One Krona Text', sans-serif;
+            font-weight: 900;
+            font-size: 3.5rem;
+            background: linear-gradient(to bottom, #0d47a1, #42a5f5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+          }
+
+          .typed-subtitle {
+            font-family: 'One Krona Text', sans-serif;
+            font-weight: 900;
+            font-size: 1.5rem;
+            background: linear-gradient(to bottom, #1565c0, #90caf9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-top: 0.5rem;
+            display: block;
+          }
+        `}
+      </style>
+    </Container>
   );
 };
 
