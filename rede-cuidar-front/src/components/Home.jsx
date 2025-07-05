@@ -49,11 +49,10 @@ const Home = () => {
   useEffect(() => {
     const typed = new Typed(typedEl.current, {
       strings: [
-        `<div class="typed-title">Rede Cuidar</div>
-         <div class="typed-subtitle">Conectando quem precisa de cuidados com quem pode oferecer.</div>`
+        `<span class="typed-subtitle">Conectando quem precisa de cuidados com quem pode oferecer.</span> `
       ],
       typeSpeed: 40,
-      showCursor: true,
+      showCursor: false,
       cursorChar: '|',
       loop: false
     });
@@ -104,22 +103,16 @@ const Home = () => {
   return (
     <Container maxWidth="lg">
       <Box sx={{ textAlign: 'center', mt: 6, mb: 4 }}>
-        <Typography
-          component="div"
-          sx={{
-            fontFamily: 'One Krona Text, sans-serif',
-            fontWeight: 700,
-            display: 'inline-block',
-            minHeight: '5rem'
-          }}>
-          <span ref={typedEl}></span>
+        <Typography component="div">
+          <div className="typed-title">Rede Cuidar</div>
+          <div ref={typedEl}></div>
         </Typography>
 
         <Box sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 2, mt: 6 }}>
           {!isLoggedIn && (
             <Button variant="contained" size="large" component={Link} to="/cadastro" sx={{
               backgroundColor: '#0d47a1', borderRadius: '50px', px: 4,
-              '&:hover': { backgroundColor: '#08306b' }
+              '&:hover': { backgroundColor: '#6aa3f7' }
             }}>Cadastre-se</Button>
           )}
           <Button variant="outlined" size="large"
@@ -127,7 +120,7 @@ const Home = () => {
             sx={{
               borderColor: '#0d47a1', color: '#0d47a1', borderRadius: '50px', px: 4,
               '&:hover': {
-                backgroundColor: '#e3f2fd', borderColor: '#08306b', color: '#08306b'
+                backgroundColor: '#79acf7', borderColor: '#08306b', color: '#08306b'
               }
             }}>
             Encontrar Serviços
@@ -173,7 +166,7 @@ const Home = () => {
         Áreas de Atuação
       </Typography>
 
-      <Grid container spacing={4}>
+ <Grid container spacing={4}>
         {[{
           titulo: "Cuidados Pessoais",
           descricao: "Atenção dedicada para idosos, crianças e PCDs, com carinho, responsabilidade e segurança.",
@@ -187,8 +180,8 @@ const Home = () => {
           descricao: "Reabilitação e cuidado com o corpo através de profissionais capacitados.",
           imagem: fisioterapia
         }, {
-          titulo: "Educação",
-          descricao: "Professores e tutores dedicados ao reforço escolar e apoio educacional de qualidade.",
+          titulo: "Infantil",
+          descricao: "Profissionais dedicados ao cuidado infantil, promovendo o bem-estar, a higiene, a alimentação adequada e o desenvolvimento saudável das crianças.",
           imagem: educacao
         }].map((item, index) => (
           <Grid item xs={12} sm={6} key={index} >
@@ -241,6 +234,9 @@ const Home = () => {
         ))}
       </Grid>
 
+
+
+
       <style>
         {`
           .typed-title {
@@ -250,6 +246,7 @@ const Home = () => {
             background: linear-gradient(to bottom, #0d47a1, #42a5f5);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
           }
 
           .typed-subtitle {
@@ -259,8 +256,6 @@ const Home = () => {
             background: linear-gradient(to bottom, #1565c0, #90caf9);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-top: 0.5rem;
-            display: block;
           }
         `}
       </style>

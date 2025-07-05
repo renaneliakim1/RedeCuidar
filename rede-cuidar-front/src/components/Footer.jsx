@@ -33,6 +33,8 @@ const Footer = () => {
           to="/fale-conosco"
           underline="hover"
           color="inherit"
+          sx={{ fontWeight: 'bold' }}
+
         >
           Fale Conosco
         </Link>

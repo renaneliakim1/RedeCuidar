@@ -23,6 +23,7 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import HomeIcon from '@mui/icons-material/Home';
 import { useThemeContext } from './ThemeContext';
+import logo02 from '../assets/logo02.png';
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -212,18 +213,17 @@ const Navbar = () => {
   return (
     <AppBar position="static" color="primary">
       <Toolbar sx={{ justifyContent: 'space-between' }}>
-        <Typography
-          variant="h6"
-          component={Link}
-          to="/"
-          sx={{
-            fontWeight: 'bold',
-            textDecoration: 'none',
-            color: '#fff',
-          }}
-        >
-          RedeCuidar
-        </Typography>
+        <Box component={Link} to="/" sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+          <Box
+            component="img"
+            src={logo02}
+            alt="Rede Cuidar"
+            sx={{
+              height: 40, // ou ajuste como preferir
+              objectFit: 'contain',
+            }}
+          />
+        </Box>
 
         {isMobile ? mobileMenu : desktopMenu}
       </Toolbar>

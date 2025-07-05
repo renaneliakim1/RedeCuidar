@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Container, Typography, Box, Button, Avatar, CircularProgress, Alert } from '@mui/material';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+
 
 const formatarEspecialidade = (valor) => {
   if (!valor) return 'Não informado';
@@ -100,11 +102,24 @@ const PerfilUsuario = () => {
         </Typography>
       </Box>
 
-      <Box textAlign="center" mt={3}>
+      <Box textAlign="center" mt={3} display="flex" justifyContent="center" gap={2}>
         <Button variant="contained" component={Link} to="/servicos">
           Voltar
         </Button>
+        {usuario.telefone && (
+          <Button
+            variant="outlined"
+            color="success"
+            startIcon={<WhatsAppIcon />}
+            href={`https://wa.me/55${usuario.telefone.replace(/\D/g, '')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            WhatsApp
+          </Button>
+        )}
       </Box>
+
     </Container>
   );
 };
