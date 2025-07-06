@@ -19,8 +19,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+       /* @Override
+        public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         System.out.println("🔍 Procurando usuário com email: " + email);
 
         Usuario usuario = usuarioRepository.findByEmail(email.trim().toLowerCase()) // remove espaços
@@ -31,5 +31,16 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .password(usuario.getSenha())
                 .authorities(new ArrayList<>()) // ou role
                 .build();
+    }*/
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        System.out.println("🔍 Procurando usuário com email: " + email);
+
+        Usuario usuario = usuarioRepository.findByEmail(email.trim().toLowerCase())
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + email));
+
+        return usuario; // ✅ Agora com roles de acordo com o email
     }
+
 }

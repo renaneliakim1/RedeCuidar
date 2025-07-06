@@ -3,6 +3,7 @@ package com.redecuidar.service;
 import com.redecuidar.dto.UsuarioDTO;
 import com.redecuidar.model.Usuario;
 import com.redecuidar.repository.UsuarioRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -127,4 +128,22 @@ public class UsuarioService {
             return usuarioRepository.save(usuarioExistente);
         }).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
     }
+
+    @PostConstruct
+    public void criarAdminPadrao() {
+        String emailAdmin = "admin@redecuidar.com";
+        if (usuarioRepository.findByEmail(emailAdmin).isEmpty()) {
+            Usuario admin = new Usuario();
+            admin.setNome("Administrador");
+            admin.setEmail(emailAdmin);
+            admin.setSenha(passwordEncoder.encode("123456")); // senha padrão
+            admin.setTelefone("999999999");
+            admin.setOfereceServico(false);
+            admin.setAvaliacaoMedia(0.0);
+
+            usuarioRepository.save(admin);
+            System.out.println("✅ Usuário administrador criado com sucesso.");
+        }
+    }
+
 }

@@ -20,6 +20,7 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
+
 const Login = () => {
   const theme = useTheme();
   const navigate = useNavigate();
@@ -59,49 +60,55 @@ const Login = () => {
 
       const texto = await response.text();
 
-      if (response.ok) {
-        localStorage.setItem('token', 'logado');
-        localStorage.setItem('email', values.email);
-        window.dispatchEvent(new Event('authChange'));
-        navigate('/');
-      } else {
-        throw new Error(texto || 'Credenciais inválidas');
-      }
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
-      recaptchaRef.current?.reset();
-    }
-  };
+    if (response.ok) {
+      const isAdmin = values.email.trim().toLowerCase() === 'admin@redecuidar.com';
 
-  const textFieldStyles = {
-    backgroundColor: theme.palette.mode === 'dark' ? '#333' : '#fff',
-    input: {
-      color: theme.palette.mode === 'dark' ? '#fff' : '#000',
-    },
-    '& input::placeholder': {
-      color: theme.palette.mode === 'dark' ? '#bbb' : '#888',
-      opacity: 1,
-    },
-    '& .MuiInputLabel-root': {
-      color: theme.palette.mode === 'dark' ? '#bbb' : undefined,
-    },
-    '& .MuiInputLabel-root.Mui-focused': {
-      color: theme.palette.mode === 'dark' ? '#90caf9' : undefined,
-    },
-    '& .MuiOutlinedInput-root': {
-      '& fieldset': {
-        borderColor: theme.palette.mode === 'dark' ? '#555' : undefined,
-      },
-      '&:hover fieldset': {
-        borderColor: theme.palette.mode === 'dark' ? '#888' : undefined,
-      },
-      '&.Mui-focused fieldset': {
-        borderColor: theme.palette.mode === 'dark' ? '#90caf9' : undefined,
-      },
-    },
-  };
+      localStorage.setItem('token', 'logado');
+      localStorage.setItem('email', values.email);
+      localStorage.setItem('isAdmin', isAdmin.toString());
+
+
+      window.dispatchEvent(new Event('authChange'));
+      navigate(isAdmin ? '/admin' : '/');
+    }
+     else {
+            throw new Error(texto || 'Credenciais inválidas');
+          }
+        } catch (error) {
+          setError(error.message);
+        } finally {
+          setLoading(false);
+          recaptchaRef.current?.reset();
+        }
+      };
+
+      const textFieldStyles = {
+        backgroundColor: theme.palette.mode === 'dark' ? '#333' : '#fff',
+        input: {
+          color: theme.palette.mode === 'dark' ? '#fff' : '#000',
+        },
+        '& input::placeholder': {
+          color: theme.palette.mode === 'dark' ? '#bbb' : '#888',
+          opacity: 1,
+        },
+        '& .MuiInputLabel-root': {
+          color: theme.palette.mode === 'dark' ? '#bbb' : undefined,
+        },
+        '& .MuiInputLabel-root.Mui-focused': {
+          color: theme.palette.mode === 'dark' ? '#90caf9' : undefined,
+        },
+        '& .MuiOutlinedInput-root': {
+          '& fieldset': {
+            borderColor: theme.palette.mode === 'dark' ? '#555' : undefined,
+          },
+          '&:hover fieldset': {
+            borderColor: theme.palette.mode === 'dark' ? '#888' : undefined,
+          },
+          '&.Mui-focused fieldset': {
+            borderColor: theme.palette.mode === 'dark' ? '#90caf9' : undefined,
+          },
+        },
+      };
 
   return (
     <Container maxWidth="sm">

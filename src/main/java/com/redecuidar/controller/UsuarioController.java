@@ -8,8 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+
+import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
 import java.util.List;
 
@@ -19,6 +24,12 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
     private final UsuarioRepository usuarioRepository;
+
+
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
 
     @Autowired
     public UsuarioController(UsuarioService usuarioService, UsuarioRepository usuarioRepository) {
@@ -62,11 +73,34 @@ public class UsuarioController {
         }
     }
 
-    @DeleteMapping("/{id}")
+/*    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarUsuario(@PathVariable Long id) {
         usuarioService.deletarUsuario(id);
         return ResponseEntity.noContent().build();
+    }*/
+
+
+    // Exemplo de controlador
+    @DeleteMapping("/usuarios/{id}")
+    public ResponseEntity<?> deletarUsuario(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        String senhaAdmin = body.get("adminPassword");
+        // buscar usuário admin no banco (ex: pelo email 'admin@redecuidar.com')
+        Usuario admin = usuarioRepository.findByEmail("admin@redecuidar.com").orElse(null);
+        if (admin == null || !passwordEncoder.matches(senhaAdmin, admin.getSenha())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Senha do administrador inválida");
+        }
+
+        // não permitir deletar admin
+        Usuario usuario = usuarioRepository.findById(id).orElse(null);
+        if (usuario == null) return ResponseEntity.notFound().build();
+        if ("admin@redecuidar.com".equalsIgnoreCase(usuario.getEmail())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Não é permitido excluir o administrador");
+        }
+
+        usuarioRepository.deleteById(id);
+        return ResponseEntity.ok("Usuário excluído com sucesso");
     }
+
 
     @GetMapping("/prestadores")
     public ResponseEntity<List<Usuario>> listarPrestadoresServico() {

@@ -35,6 +35,7 @@ const Navbar = () => {
   const theme = useTheme();
   const { toggleTheme, mode } = useThemeContext();
   const isMobile = useMediaQuery('(max-width:600px)');
+  const isAdmin = localStorage.getItem('isAdmin') === 'true';
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -65,46 +66,44 @@ const Navbar = () => {
 
   const textColor = theme.palette.primary.contrastText;
 
-  // Desktop menu com link "Início" (se não estiver na home)
   const desktopMenu = (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-      {location.pathname !== '/' && (
-        <Button
-          component={Link}
-          to="/"
-          sx={{ color: textColor, textTransform: 'none' }}
-        >
+      {location.pathname !== '/' && !isAdmin && (
+        <Button component={Link} to="/" sx={{ color: textColor, textTransform: 'none' }}>
           Início
         </Button>
       )}
 
+
       {!isLoggedIn ? (
         <>
-          <Button
-            component={Link}
-            to="/login"
-            sx={{ color: textColor, textTransform: 'none' }}
-          >
+          <Button component={Link} to="/login" sx={{ color: textColor, textTransform: 'none' }}>
             Login
           </Button>
-          <Button
-            component={Link}
-            to="/cadastro"
-            sx={{ color: textColor, textTransform: 'none' }}
-          >
+          <Button component={Link} to="/cadastro" sx={{ color: textColor, textTransform: 'none' }}>
             Cadastre-se
+          </Button>
+        </>
+      ) : isAdmin ? (
+        <>
+          {/* Para admin: só Sair */}
+          <Button onClick={handleLogout} sx={{ color: textColor, textTransform: 'none' }}>
+            Sair
           </Button>
         </>
       ) : (
         <>
-          <Button
-            onClick={handleMenuOpen}
-            sx={{ color: textColor, textTransform: 'none' }}
-          >
+          {/* Usuário normal */}
+          <Button onClick={handleMenuOpen} sx={{ color: textColor, textTransform: 'none' }}>
             Minha Conta {nomeUsuario}
           </Button>
           <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-            <MenuItem onClick={() => { handleMenuClose(); navigate('/perfil'); }}>
+            <MenuItem
+              onClick={() => {
+                handleMenuClose();
+                navigate('/perfil');
+              }}
+            >
               Perfil
             </MenuItem>
             <MenuItem onClick={handleLogout}>Sair</MenuItem>
@@ -127,35 +126,26 @@ const Navbar = () => {
     </Box>
   );
 
-  // Mobile menu com ícone Home e menu hambúrguer alinhados à direita
   const mobileMenu = (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-      {location.pathname !== '/' && (
-        <IconButton
-          component={Link}
-          to="/"
-          sx={{ color: textColor, mr: 1 }}
-          aria-label="Início"
-          size="large"
-        >
-          <HomeIcon />
-        </IconButton>
-      )}
+     {location.pathname !== '/' && !isAdmin && (
+       <IconButton
+         component={Link}
+         to="/"
+         sx={{ color: textColor, mr: 1 }}
+         aria-label="Início"
+         size="large"
+       >
+         <HomeIcon />
+       </IconButton>
+     )}
 
-      <IconButton
-        edge="end"
-        color="inherit"
-        aria-label="menu"
-        onClick={() => setDrawerOpen(true)}
-      >
+
+      <IconButton edge="end" color="inherit" aria-label="menu" onClick={() => setDrawerOpen(true)}>
         <MenuIcon />
       </IconButton>
 
-      <Drawer
-        anchor="right"
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-      >
+      <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
         <Box
           sx={{
             width: 250,
@@ -169,36 +159,30 @@ const Navbar = () => {
           <List>
             {!isLoggedIn ? (
               <>
-                <ListItem button component={Link} to="/login">
-                  <ListItemText
-                    primary="Login"
-                    sx={{ color: theme.palette.text.primary }}
-                  />
+                <ListItem component={Link} to="/login">
+                  <ListItemText primary="Login" sx={{ color: theme.palette.text.primary }} />
                 </ListItem>
-                <ListItem button component={Link} to="/cadastro">
-                  <ListItemText
-                    primary="Cadastre-se"
-                    sx={{ color: theme.palette.text.primary }}
-                  />
+                <ListItem component={Link} to="/cadastro">
+                  <ListItemText primary="Cadastre-se" sx={{ color: theme.palette.text.primary }} />
+                </ListItem>
+              </>
+            ) : isAdmin ? (
+              <>
+                <ListItem onClick={handleLogout}>
+                  <ListItemText primary="Sair" sx={{ color: theme.palette.text.primary }} />
                 </ListItem>
               </>
             ) : (
               <>
-                <ListItem button onClick={() => navigate('/perfil')}>
-                  <ListItemText
-                    primary="Perfil"
-                    sx={{ color: theme.palette.text.primary }}
-                  />
+                <ListItem onClick={() => navigate('/perfil')}>
+                  <ListItemText primary="Perfil" sx={{ color: theme.palette.text.primary }} />
                 </ListItem>
-                <ListItem button onClick={handleLogout}>
-                  <ListItemText
-                    primary="Sair"
-                    sx={{ color: theme.palette.text.primary }}
-                  />
+                <ListItem onClick={handleLogout}>
+                  <ListItemText primary="Sair" sx={{ color: theme.palette.text.primary }} />
                 </ListItem>
               </>
             )}
-            <ListItem button onClick={toggleTheme}>
+            <ListItem onClick={toggleTheme}>
               <ListItemText
                 primary={mode === 'dark' ? 'Tema Claro' : 'Tema Escuro'}
                 sx={{ color: theme.palette.text.primary }}
@@ -213,16 +197,12 @@ const Navbar = () => {
   return (
     <AppBar position="static" color="primary">
       <Toolbar sx={{ justifyContent: 'space-between' }}>
-        <Box component={Link} to="/" sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-          <Box
-            component="img"
-            src={logo02}
-            alt="Rede Cuidar"
-            sx={{
-              height: 40, // ou ajuste como preferir
-              objectFit: 'contain',
-            }}
-          />
+        <Box
+          component={Link}
+          to="/"
+          sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
+        >
+          <Box component="img" src={logo02} alt="Rede Cuidar" sx={{ height: 40, objectFit: 'contain' }} />
         </Box>
 
         {isMobile ? mobileMenu : desktopMenu}
