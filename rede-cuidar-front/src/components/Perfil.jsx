@@ -133,7 +133,7 @@ const Perfil = () => {
     if (!window.confirm('Tem certeza que deseja excluir seu perfil?')) return;
     setLoading(true);
     try {
-      await axios.delete(`http://localhost:8080/usuarios/${usuario.id}`);
+      await axios.delete('http://localhost:8080/usuarios/me', { withCredentials: true });
       localStorage.clear();
       window.location.href = '/';
     } catch {

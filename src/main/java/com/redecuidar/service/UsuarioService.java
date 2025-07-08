@@ -146,4 +146,10 @@ public class UsuarioService {
         }
     }
 
+    public void excluirPorEmail(String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado para exclusão"));
+        usuarioRepository.delete(usuario);
+    }
+
 }
