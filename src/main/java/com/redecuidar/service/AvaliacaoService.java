@@ -66,9 +66,11 @@ public class AvaliacaoService {
     public List<AvaliacaoAdminDTO> listarParaAdmin() {
         return avaliacaoRepository.findAllComAvaliador().stream()
                 .map(av -> new AvaliacaoAdminDTO(
+                        av.getId(), // ✅ Adiciona o id da avaliação
                         av.getAvaliador() != null ? av.getAvaliador().getNome() : "Usuário",
                         av.getComentario()
                 ))
                 .collect(Collectors.toList());
     }
+
 }

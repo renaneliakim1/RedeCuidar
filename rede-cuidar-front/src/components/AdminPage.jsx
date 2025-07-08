@@ -25,11 +25,14 @@ const AdminPage = () => {
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
+    console.log("Comentários recebidos:", comentarios)
     const email = localStorage.getItem('email');
     if (email !== 'admin@redecuidar.com') {
       navigate('/');
       return;
     }
+
+
     carregarUsuarios();
     carregarComentarios();
   }, [navigate]);
@@ -155,7 +158,9 @@ const AdminPage = () => {
           <Typography variant="h5" gutterBottom>Comentários</Typography>
           {Array.isArray(comentarios) && comentarios.length > 0 ? (
             <Box component="ul" sx={{ listStyle: 'none', p: 0 }}>
-              {comentarios.map((c) => (
+            {comentarios.map((c) => {
+              console.log(c);
+              return (
                 <Box
                   component="li"
                   key={c.id}
@@ -164,22 +169,25 @@ const AdminPage = () => {
                     p: 2,
                     border: `1px solid ${theme.palette.divider}`,
                     borderRadius: 1,
-                    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100],
+                    backgroundColor:
+                      theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100],
                     color: theme.palette.text.primary
                   })}
                 >
-
                   <Typography variant="subtitle2">
                     <strong>{c.nomeAvaliador || 'Usuário'}</strong> comentou:
                   </Typography>
                   <Typography variant="body1" gutterBottom>
                     <strong>{c.comentario}</strong>
                   </Typography>
+
                   <Button variant="outlined" color="error" onClick={() => excluirComentario(c.id)}>
                     Excluir Comentário
                   </Button>
                 </Box>
-              ))}
+              );
+            })}
+
             </Box>
           ) : (
             <Typography>Nenhum comentário encontrado.</Typography>

@@ -54,4 +54,7 @@ public class AvaliacaoController {
         List<AvaliacaoRespostaDTO> avaliacoes = avaliacaoService.listarDTOPorAvaliado(id);
         return ResponseEntity.ok(avaliacoes);
     }
+
+
+
 }
