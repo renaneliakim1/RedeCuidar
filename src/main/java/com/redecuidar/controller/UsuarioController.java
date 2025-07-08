@@ -81,7 +81,8 @@ public class UsuarioController {
 
 
     // Exemplo de controlador
-    @DeleteMapping("/usuarios/{id}")
+    /*@DeleteMapping("/usuarios/{id}")*/
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deletarUsuario(@PathVariable Long id, @RequestBody Map<String, String> body) {
         String senhaAdmin = body.get("adminPassword");
         // buscar usuário admin no banco (ex: pelo email 'admin@redecuidar.com')

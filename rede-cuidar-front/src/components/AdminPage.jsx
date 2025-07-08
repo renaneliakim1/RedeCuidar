@@ -7,16 +7,16 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  TextField,
   Typography,
   CircularProgress,
   Alert,
+  TextField
 } from '@mui/material';
 
 const AdminPage = () => {
   const navigate = useNavigate();
   const [usuarios, setUsuarios] = useState([]);
-  const [servicos, setServicos] = useState([]);
+  const [comentarios, setComentarios] = useState([]);
 
   const [userToDelete, setUserToDelete] = useState(null);
   const [confirmEmail, setConfirmEmail] = useState('');
@@ -24,53 +24,47 @@ const AdminPage = () => {
   const [deleteError, setDeleteError] = useState('');
   const [deleting, setDeleting] = useState(false);
 
-  const [openForm, setOpenForm] = useState(false);
-  const [formLoading, setFormLoading] = useState(false);
-  const [formError, setFormError] = useState('');
-  const [servicoAtual, setServicoAtual] = useState(null);
-
-  const [titulo, setTitulo] = useState('');
-  const [descricao, setDescricao] = useState('');
-  const [preco, setPreco] = useState('');
-
   useEffect(() => {
     const email = localStorage.getItem('email');
-    const isAdmin = email === 'admin@redecuidar.com';
-    if (!isAdmin) {
+    if (email !== 'admin@redecuidar.com') {
       navigate('/');
       return;
     }
     carregarUsuarios();
-    carregarServicos();
+    carregarComentarios();
   }, [navigate]);
 
   const carregarUsuarios = () => {
-    fetch('http://localhost:8080/usuarios', {
-      credentials: 'include',
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error('Erro ao carregar usuários');
-        return res.json();
-      })
+    fetch('http://localhost:8080/usuarios', { credentials: 'include' })
+      .then((res) => res.ok ? res.json() : Promise.reject('Erro ao buscar usuários'))
       .then(setUsuarios)
-      .catch((err) => console.error('Erro ao carregar usuários', err));
+      .catch((err) => console.error(err));
   };
 
+    const carregarComentarios = () => {
+      fetch('http://localhost:8080/avaliacoes/admin', { credentials: 'include' })
+        .then((res) => res.ok ? res.json() : Promise.reject('Erro ao buscar avaliações'))
+        .then(setComentarios)
+        .catch((err) => {
+          console.error(err);
+          setComentarios([]);
+        });
+    };
 
 
-  const carregarServicos = () => {
-    fetch('http://localhost:8080/api/servicos', {
-      credentials: 'include', // envia o cookie da sessão
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error('Erro ao carregar serviços');
-        return res.json();
-      })
-      .then(setServicos)
-      .catch((err) => console.error('Erro ao carregar serviços', err));
+  const excluirComentario = async (id) => {
+    if (!window.confirm("Tem certeza que deseja excluir esta avaliação?")) return;
+    try {
+      const res = await fetch(`http://localhost:8080/avaliacoes/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      if (!res.ok) throw new Error('Erro ao excluir comentário');
+      carregarComentarios();
+    } catch (err) {
+      alert(err.message || "Erro ao excluir");
+    }
   };
-
-
 
   const abrirConfirmacaoExclusao = (usuario) => {
     setUserToDelete(usuario);
@@ -97,8 +91,6 @@ const AdminPage = () => {
     }
 
     setDeleting(true);
-    setDeleteError('');
-
     try {
       const res = await fetch(`http://localhost:8080/usuarios/${userToDelete.id}`, {
         method: 'DELETE',
@@ -118,65 +110,6 @@ const AdminPage = () => {
     } finally {
       setDeleting(false);
     }
-  };
-
-  const abrirFormAdicionar = () => {
-    setServicoAtual(null);
-    setTitulo('');
-    setDescricao('');
-    setPreco('');
-    setFormError('');
-    setOpenForm(true);
-  };
-
-  const abrirFormEditar = (servico) => {
-    setServicoAtual(servico);
-    setTitulo(servico.titulo);
-    setDescricao(servico.descricaoServico || '');
-    setPreco(servico.preco);
-    setFormError('');
-    setOpenForm(true);
-  };
-
-  const fecharForm = () => {
-    setOpenForm(false);
-  };
-
-  const salvarServico = () => {
-    if (!titulo.trim()) {
-      setFormError('O título é obrigatório');
-      return;
-    }
-
-    setFormLoading(true);
-    setFormError('');
-
-    fetch('http://localhost:8080/api/servicos', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ titulo }),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error('Erro ao salvar serviço');
-        return res.json();
-      })
-      .then(() => {
-        carregarServicos();
-        fecharForm();
-      })
-      .catch((err) => setFormError(err.message))
-      .finally(() => setFormLoading(false));
-  };
-
-  const excluirServico = (id) => {
-    if (!window.confirm('Tem certeza que deseja excluir este serviço?')) return;
-
-    fetch(`http://localhost:8080/api/servicos/${id}`, { method: 'DELETE' })
-      .then(res => {
-        if (res.ok) carregarServicos();
-        else alert('Erro ao excluir serviço');
-      })
-      .catch(() => alert('Erro ao excluir serviço'));
   };
 
   return (
@@ -217,72 +150,42 @@ const AdminPage = () => {
           )}
         </Box>
 
-        {/* Serviços */}
-    {/* Serviços */}
-    <Box>
-      <Typography variant="h5" gutterBottom>Serviços</Typography>
-
-      <Button variant="contained" sx={{ mb: 2 }} onClick={abrirFormAdicionar}>
-        Adicionar Serviço
-      </Button>
-
-      {servicos.length === 0 ? (
-        <Typography>Nenhum serviço encontrado.</Typography>
-      ) : (
-        <Box component="ul" sx={{ listStyle: 'none', p: 0 }}>
-          {servicos.map((s) => (
-            <Box
-              component="li"
-              key={s.id}
-              sx={{
-                mb: 1,
-                p: 1,
-                border: '1px solid #ccc',
-                borderRadius: 1,
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <span>{s.titulo}</span>
-              <Box>
-                <Button
-                  variant="outlined"
-                  color="error"
-                  onClick={() => excluirServico(s.id)}
+        {/* Comentários */}
+        <Box>
+          <Typography variant="h5" gutterBottom>Comentários</Typography>
+          {Array.isArray(comentarios) && comentarios.length > 0 ? (
+            <Box component="ul" sx={{ listStyle: 'none', p: 0 }}>
+              {comentarios.map((c) => (
+                <Box
+                  component="li"
+                  key={c.id}
+                  sx={(theme) => ({
+                    mb: 2,
+                    p: 2,
+                    border: `1px solid ${theme.palette.divider}`,
+                    borderRadius: 1,
+                    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100],
+                    color: theme.palette.text.primary
+                  })}
                 >
-                  Excluir
-                </Button>
-              </Box>
+
+                  <Typography variant="subtitle2">
+                    <strong>{c.nomeAvaliador || 'Usuário'}</strong> comentou:
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    <strong>{c.comentario}</strong>
+                  </Typography>
+                  <Button variant="outlined" color="error" onClick={() => excluirComentario(c.id)}>
+                    Excluir Comentário
+                  </Button>
+                </Box>
+              ))}
             </Box>
-          ))}
+          ) : (
+            <Typography>Nenhum comentário encontrado.</Typography>
+          )}
         </Box>
-      )}
-    </Box>
-
       </Box>
-
-      {/* Modal: formulário serviço */}
-      <Dialog open={openForm} onClose={fecharForm} fullWidth maxWidth="sm">
-        <DialogTitle>Adicionar Serviço</DialogTitle>
-        <DialogContent>
-          {formError && <Alert severity="error" sx={{ mb: 2 }}>{formError}</Alert>}
-          <TextField
-            label="Título"
-            fullWidth
-            margin="normal"
-            value={titulo}
-            onChange={(e) => setTitulo(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={fecharForm} disabled={formLoading}>Cancelar</Button>
-          <Button onClick={salvarServico} variant="contained" disabled={formLoading}>
-            {formLoading ? <CircularProgress size={24} /> : 'Salvar'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
 
       {/* Modal: confirmação exclusão usuário */}
       <Dialog open={Boolean(userToDelete)} onClose={fecharConfirmacao}>

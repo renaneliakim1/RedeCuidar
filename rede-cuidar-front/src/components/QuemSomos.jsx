@@ -10,7 +10,7 @@ const QuemSomos = () => {
         </Typography>
 
         <Typography variant="body1" paragraph>
-          A <strong>Rede Cuidar+</strong> é uma plataforma digital criada para conectar pessoas que buscam
+          A <strong>Rede Cuidar</strong> é uma plataforma digital criada para conectar pessoas que buscam
           cuidados e serviços especializados com profissionais qualificados. Nosso objetivo é facilitar
           o acesso a serviços de cuidados pessoais, saúde, educação e muito mais, promovendo inclusão social
           e valorização dos prestadores.

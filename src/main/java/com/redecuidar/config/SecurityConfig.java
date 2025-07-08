@@ -47,6 +47,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/public/**", "/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers("/usuarios/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/avaliacoes").authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -75,13 +76,17 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://localhost:5173","http://localhost:5174"));
+        // Use allowedOriginPatterns para evitar conflito com allowCredentials(true)
+        config.setAllowedOriginPatterns(Arrays.asList("http://localhost:5173", "http://localhost:5174"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(Arrays.asList("*"));
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "X-Requested-With"));
+        config.setExposedHeaders(Arrays.asList("Authorization", "Content-Disposition"));
         config.setAllowCredentials(true);
+        config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
     }
+
 }

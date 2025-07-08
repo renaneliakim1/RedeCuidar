@@ -1,25 +1,80 @@
 package com.redecuidar.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.springframework.security.core.userdetails.UserDetails;
-
-
 @Entity
 @Data
 @NoArgsConstructor
 @Table(name = "usuarios")
-public class Usuario  implements UserDetails {
+public class Usuario implements UserDetails {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank(message = "Nome é obrigatório")
+    private String nome;
+
+    @NotBlank(message = "Email é obrigatório")
+    @Email(message = "Email deve ser válido")
+    @Column(unique = true)
+    private String email;
+
+    @NotBlank(message = "Senha é obrigatória")
+    @Size(min = 6, message = "Senha deve ter no mínimo 6 caracteres")
+    private String senha;
+
+    @NotBlank(message = "Telefone é obrigatório")
+    private String telefone;
+
+    private String cep;
+    private String bairro;
+    private String cidade;
+    private String estado;
+
+    private boolean ofereceServico;
+
+    private String fotoPerfil;
+
+    @Enumerated(EnumType.STRING)
+    private Especialidade especialidade;
+
+    private String descricaoServico;
+
+    private Double avaliacaoMedia = 0.0;
+
+    public enum Especialidade {
+        CUIDADOR,
+        BABA,
+        ENFERMEIRO,
+        FISIOTERAPEUTA,
+        MEDICO,
+        PSICOLOGO,
+        NUTRICIONISTA,
+        BARBEIRO_A_DOMICILIO,
+        FAXINEIRO
+    }
+
+    @OneToMany(mappedBy = "avaliador", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonManagedReference(value = "avaliacoes-feitas")
+    private List<Avaliacao> avaliacoesFeitas;
+
+    @OneToMany(mappedBy = "avaliado", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonManagedReference(value = "avaliacoes-recebidas")
+    private List<Avaliacao> avaliacoesRecebidas;
+
+    // Métodos do UserDetails
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -62,57 +117,14 @@ public class Usuario  implements UserDetails {
         return true;
     }
 
-
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @NotBlank(message = "Nome é obrigatório")
-    private String nome;
-
-    @NotBlank(message = "Email é obrigatório")
-    @Email(message = "Email deve ser válido")
-    @Column(unique = true)
-    private String email;
-
-    @NotBlank(message = "Senha é obrigatória")
-    @Size(min = 6, message = "Senha deve ter no mínimo 6 caracteres")
-    private String senha;
-
-    @NotBlank(message = "Telefone é obrigatório")
-    private String telefone;
-
-
-    private String cep;
-    private String bairro;
-    private String cidade;
-    private String estado;
-
-
-    private boolean ofereceServico;
-
-    private String fotoPerfil;
-
-    @Enumerated(EnumType.STRING)
-    private Especialidade especialidade;
-
-    private String descricaoServico;
-
-    private Double avaliacaoMedia = 0.0;
-
-    public enum Especialidade {
-        CUIDADOR,
-        BABA,
-        ENFERMEIRO,
-        FISIOTERAPEUTA,
-        MEDICO,
-        PSICOLOGO,
-        NUTRICIONISTA,
-        BARBEIRO_A_DOMICILIO,
-        FAXINEIRO
+    @Override
+    public String toString() {
+        return "Usuario{" +
+                "id=" + id +
+                ", nome='" + nome + '\'' +
+                ", email='" + email + '\'' +
+                // Não inclua avaliaçõesFeitas ou outras coleções aqui!
+                '}';
     }
-
-
 
 }
