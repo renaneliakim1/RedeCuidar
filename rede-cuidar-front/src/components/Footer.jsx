@@ -23,7 +23,15 @@ const Footer = () => {
           to="/quem-somos"
           underline="hover"
           color="inherit"
-          sx={{ fontWeight: 'bold' }}
+          sx={{
+            fontWeight: 'normal',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              fontWeight: 'bold',
+              textDecoration: 'none',
+            }
+          }}
         >
           Quem Somos
         </Link>
@@ -33,8 +41,15 @@ const Footer = () => {
           to="/fale-conosco"
           underline="hover"
           color="inherit"
-          sx={{ fontWeight: 'bold' }}
-
+          sx={{
+            fontWeight: 'normal',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              fontWeight: 'bold',
+              textDecoration: 'none',
+            }
+          }}
         >
           Fale Conosco
         </Link>

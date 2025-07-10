@@ -13,10 +13,15 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Typed from 'typed.js';
 
+// Imagens
 import cuidados from '../assets/cuidados.jpg';
 import saudemental from '../assets/saudemental.jpg';
 import educacao from '../assets/educacao.jpg';
 import fisioterapia from '../assets/fisioterapia.jpg';
+import fundoHome from '../assets/home.jpg';
+import grupodeidosos from '../assets/grupodeidosos.jpg';
+import psicologa from '../assets/psicologa.jpg';
+import cadeirante from '../assets/cadeirante.jpg';
 
 const BluePrevArrow = (props) => (
   <IconButton onClick={props.onClick} sx={{
@@ -49,14 +54,12 @@ const Home = () => {
   useEffect(() => {
     const typed = new Typed(typedEl.current, {
       strings: [
-        `<span class="typed-subtitle">Conectando quem precisa de cuidados com quem pode oferecer.</span> `
+        '<span class="typed-subtitle">Conectando quem precisa de cuidados com quem pode oferecer.</span>'
       ],
       typeSpeed: 40,
       showCursor: false,
-      cursorChar: '|',
       loop: false
     });
-
     return () => typed.destroy();
   }, []);
 
@@ -102,32 +105,87 @@ const Home = () => {
 
   return (
     <Container maxWidth="lg">
-      <Box sx={{ textAlign: 'center', mt: 6, mb: 4 }}>
-        <Typography component="div">
-          <div className="typed-title">Rede Cuidar</div>
-          <div ref={typedEl}></div>
-        </Typography>
+      {/* 🔷 Carrossel com sobreposição */}
+      <Box sx={{ position: 'relative', mt: 6, mb: 4, borderRadius: 3, overflow: 'hidden' }}>
+        <Slider autoplay autoplaySpeed={4000} infinite arrows={false} dots={false} speed={800} slidesToShow={1} slidesToScroll={1}>
+          {[cadeirante, grupodeidosos, psicologa].map((img, index) => (
+            <Box
+              key={index}
+              sx={{
+                height: { xs: 630, md: 400 },
+                backgroundImage: `url(${img})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                position: 'relative'
+              }}
+            >
+              <Box sx={{
+                position: 'absolute', width: '100%', height: '100%',
+                bgcolor: 'rgba(255,255,255,0.7)', top: 0, left: 0
+              }} />
+            </Box>
+          ))}
+        </Slider>
 
-        <Box sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 2, mt: 6 }}>
-          {!isLoggedIn && (
-            <Button variant="contained" size="large" component={Link} to="/cadastro" sx={{
-              backgroundColor: '#0d47a1', borderRadius: '50px', px: 4,
-              '&:hover': { backgroundColor: '#6aa3f7' }
-            }}>Cadastre-se</Button>
-          )}
-          <Button variant="outlined" size="large"
-            onClick={() => navigate(isLoggedIn ? '/servicos' : '/bloqueado')}
-            sx={{
-              borderColor: '#0d47a1', color: '#0d47a1', borderRadius: '50px', px: 4,
-              '&:hover': {
-                backgroundColor: '#79acf7', borderColor: '#08306b', color: '#08306b'
-              }
-            }}>
-            Encontrar Serviços
-          </Button>
+        <Box sx={{
+          position: 'absolute',
+          top: 0, left: 0, width: '100%', height: '100%',
+          zIndex: 1, display: 'flex', alignItems: 'center',
+          justifyContent: 'center', flexDirection: 'column',
+          textAlign: 'center', px: 2
+        }}>
+          <Typography component="div">
+            <div className="typed-title">Rede Cuidar</div>
+            <div ref={typedEl}></div>
+          </Typography>
+
+          <Box sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 2, mt: 4 }}>
+            {!isLoggedIn && (
+              <Button
+                variant="contained"
+                size="large"
+                component={Link}
+                to="/cadastro"
+                sx={{
+                  width: 220,
+                  height: 50,
+                  fontWeight: 'bold',
+                  fontSize: '1rem',
+                  borderRadius: '50px',
+                  backgroundColor: '#0d47a1',
+                  '&:hover': { backgroundColor: '#6aa3f7' }
+                }}
+              >
+                Cadastre-se
+              </Button>
+            )}
+            <Button
+              variant="contained"
+              size="large"
+              onClick={() => navigate(isLoggedIn ? '/servicos' : '/bloqueado')}
+              sx={{
+                width: 220,
+                height: 50,
+                fontWeight: 'bold',
+                fontSize: '1rem',
+                borderRadius: '50px',
+                backgroundColor: '#ffffff',
+                color: '#0d47a1',
+                boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
+                '&:hover': {
+                  backgroundColor: '#e3f2fd',
+                  color: '#0d47a1',
+                  transform: 'scale(1.03)'
+                }
+              }}
+            >
+              Encontrar Serviços
+            </Button>
+          </Box>
         </Box>
       </Box>
 
+      {/* 🔷 Profissionais em destaque */}
       <Typography variant="h5" sx={{ mt: 8, mb: 4, fontWeight: 600 }}>
         Profissionais em destaque
       </Typography>
@@ -162,11 +220,12 @@ const Home = () => {
         </Slider>
       </Box>
 
+      {/* 🔷 Áreas de atuação */}
       <Typography variant="h5" sx={{ mt: 10, mb: 4, fontWeight: 600, textAlign: 'center' }}>
         Áreas de Atuação
       </Typography>
 
- <Grid container spacing={4}>
+      <Grid container spacing={4}>
         {[{
           titulo: "Cuidados Pessoais",
           descricao: "Atenção dedicada para idosos, crianças e PCDs, com carinho, responsabilidade e segurança.",
@@ -184,17 +243,14 @@ const Home = () => {
           descricao: "Profissionais dedicados ao cuidado infantil, promovendo o bem-estar, a higiene, a alimentação adequada e o desenvolvimento saudável das crianças.",
           imagem: educacao
         }].map((item, index) => (
-          <Grid item xs={12} sm={6} key={index} >
+          <Grid item xs={12} sm={6} key={index}>
             <Card sx={{
               display: 'flex',
               flexDirection: {
                 xs: 'column',
                 sm: index % 2 === 0 ? 'row' : 'row-reverse'
               },
-              height: {
-                xs: 'auto',
-                sm: 200
-              },
+              height: { xs: 'auto', sm: 200 },
               borderRadius: 2,
               boxShadow: 3,
               overflow: 'hidden'
@@ -204,14 +260,8 @@ const Home = () => {
                 image={item.imagem}
                 alt={item.titulo}
                 sx={{
-                  width: {
-                    xs: '100%',
-                    sm: 1200
-                  },
-                  height: {
-                    xs: 160,
-                    sm: '100%'
-                  },
+                  width: { xs: '100%', sm: 1200 },
+                  height: { xs: 160, sm: '100%' },
                   objectFit: 'cover'
                 }}
               />
@@ -222,38 +272,31 @@ const Home = () => {
                 width: '100%',
                 padding: 2
               }}>
-                <Typography variant="h6" fontWeight={600} gutterBottom>
-                  {item.titulo}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {item.descricao}
-                </Typography>
+                <Typography variant="h6" fontWeight={600} gutterBottom>{item.titulo}</Typography>
+                <Typography variant="body2" color="text.secondary">{item.descricao}</Typography>
               </CardContent>
             </Card>
           </Grid>
         ))}
       </Grid>
 
-
-
-
+      {/* 🔷 Estilo do texto animado */}
       <style>
         {`
           .typed-title {
             font-family: 'One Krona Text', sans-serif;
             font-weight: 900;
-            font-size: 3.5rem;
-            background: linear-gradient(to bottom, #0d47a1, #42a5f5);
+            font-size: 4rem;
+            background: linear-gradient(to bottom, #0d47a1 0%, #42a5f5 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 0.5rem;
           }
-
           .typed-subtitle {
             font-family: 'One Krona Text', sans-serif;
             font-weight: 900;
-            font-size: 1.5rem;
-            background: linear-gradient(to bottom, #1565c0, #90caf9);
+            font-size: 2rem;
+            background: linear-gradient(to bottom, #0d47a1 0%, #42a5f5 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
           }

@@ -19,6 +19,10 @@ import Bloqueado from './components/Bloqueado';
 import QuemSomos from './components/QuemSomos';
 import FaleConosco from './components/FaleConosco';
 import AdminPage from './components/AdminPage';
+import EsqueciSenha from './components/EsqueciSenha';
+import RedefinirSenha from './components/RedefinirSenha';
+
+
 
 
 function App() {
@@ -45,6 +49,8 @@ function App() {
           <Route path="/fale-conosco" element={<FaleConosco />} />
           <Route path="/bloqueado" element={<Bloqueado />} />
           <Route path="/servicos" element={<ListaServicos />} />
+          <Route path="/esqueci-senha" element={<EsqueciSenha />} />
+          <Route path="/redefinir-senha" element={<RedefinirSenha />} />
 
           {/* Rotas privadas usuárias comuns e admin */}
           <Route element={<PrivateRoute />}>
@@ -59,6 +65,9 @@ function App() {
             <Route path="/servicos/novo" element={<CadastroServico />} />
             <Route path="/servicos/editar/:id" element={<EditarServico />} />
             <Route path="/servicos/:id" element={<DetalheServico />} />
+
+
+
           </Route>
 
           {/* Rotas só para admin */}

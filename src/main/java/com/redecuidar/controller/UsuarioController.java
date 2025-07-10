@@ -130,7 +130,6 @@ public class UsuarioController {
         return usuarioRepository.findByOfereceServicoTrue();
     }
 
-
     @DeleteMapping("/me")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> excluirMeuPerfil(@AuthenticationPrincipal UserDetails userDetails) {
@@ -138,6 +137,8 @@ public class UsuarioController {
         usuarioService.excluirPorEmail(email);
         return ResponseEntity.noContent().build();
     }
+
+
 
 
 

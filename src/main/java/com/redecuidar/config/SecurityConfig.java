@@ -33,32 +33,43 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    // AuthenticationManager necessário para autenticação manual no AuthController
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
+    // Segurança geral da API
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable()) // Desativado para permitir chamadas POST externas (fetch/axios)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/public/**", "/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                        .requestMatchers("/usuarios/**").permitAll()
+                        // Endpoints públicos
+                        .requestMatchers("/api/auth/login", "/api/auth/registro", "/api/auth/salvar-token", "/api/auth/redefinir-senha").permitAll()
+                        .requestMatchers("/api/public/**").permitAll()
+                        /* .requestMatchers("/usuarios/**").permitAll()*/
+                        .requestMatchers(HttpMethod.GET, "/usuarios/**").permitAll()
+
+                        .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
+                        .requestMatchers("/api/auth/salvar-token", "/api/auth/redefinir-senha", "/api/auth/login").permitAll()
+
+                        .requestMatchers("/uploads/fotos-perfil/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/avaliacoes").authenticated()
+
+
+                        // Protegidos (exemplo: POST em avaliações)
+                        .requestMatchers(HttpMethod.POST, "/avaliacoes").authenticated()
+
+                        // Tudo mais exige autenticação
                         .anyRequest().authenticated()
                 )
-                .formLogin(form -> form
-                        .loginProcessingUrl("/api/auth/login")
-                        .usernameParameter("email")
-                        .passwordParameter("senha")
-                        .successHandler((req, res, auth) -> res.setStatus(HttpStatus.OK.value()))
-                        .failureHandler((req, res, ex) -> res.setStatus(HttpStatus.UNAUTHORIZED.value()))
-                )
+
+
+                // Logout customizado (opcional)
                 .logout(logout -> logout
-                        .logoutUrl("/api/auth/logout")
+                        .logoutUrl("/auth/logout")
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
                         .deleteCookies("JSESSIONID")
@@ -66,6 +77,8 @@ public class SecurityConfig {
                             response.setStatus(HttpStatus.OK.value());
                         })
                 )
+
+                // Tratamento de erros
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((req, res, authEx) -> res.setStatus(HttpStatus.UNAUTHORIZED.value()))
                 );
@@ -73,20 +86,19 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // Configuração de CORS para permitir comunicação com o frontend
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // Use allowedOriginPatterns para evitar conflito com allowCredentials(true)
         config.setAllowedOriginPatterns(Arrays.asList("http://localhost:5173", "http://localhost:5174"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "X-Requested-With"));
         config.setExposedHeaders(Arrays.asList("Authorization", "Content-Disposition"));
-        config.setAllowCredentials(true);
-        config.setMaxAge(3600L);
+        config.setAllowCredentials(true); // Importante se você usa `credentials: 'include'` no frontend
+        config.setMaxAge(3600L); // 1h
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
     }
-
 }

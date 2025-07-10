@@ -104,9 +104,11 @@ const Perfil = () => {
         data.append('foto', novaFoto);
       }
 
-      const response = await axios.put(`http://localhost:8080/usuarios/${usuario.id}`, data, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+        const response = await axios.put(`http://localhost:8080/usuarios/${usuario.id}`, data, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+          withCredentials: true, // 👈 isso faz enviar o cookie JSESSIONID
+        });
+
 
       setUsuario(response.data);
       setEditando(false);
@@ -129,7 +131,7 @@ const Perfil = () => {
     }
   };
 
-  const handleExcluir = async () => {
+ /*  const handleExcluir = async () => {
     if (!window.confirm('Tem certeza que deseja excluir seu perfil?')) return;
     setLoading(true);
     try {
@@ -141,7 +143,32 @@ const Perfil = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }; */
+
+
+      const handleExcluir = async () => {
+        if (!window.confirm('Tem certeza que deseja excluir seu perfil?')) return;
+        setLoading(true);
+
+        const email = localStorage.getItem('email');
+
+        try {
+            await axios.delete('http://localhost:8080/usuarios/me', {
+              data: { email },
+              headers: { 'Content-Type': 'application/json' },
+              withCredentials: true, // 👈 isso aqui é o que faltava!
+            });
+
+
+          localStorage.clear();
+          window.location.href = '/';
+        } catch {
+          setErro('Erro ao excluir perfil.');
+        } finally {
+          setLoading(false);
+        }
+      };
+
 
   if (loading) {
     return (

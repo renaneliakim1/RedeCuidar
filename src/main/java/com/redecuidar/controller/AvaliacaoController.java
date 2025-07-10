@@ -25,10 +25,12 @@ public class AvaliacaoController {
     }
 
     @PostMapping
+    @PreAuthorize("isAuthenticated()")
     public Avaliacao criar(@RequestBody AvaliacaoDTO dto, @AuthenticationPrincipal UserDetails userDetails) {
         dto.setEmailAvaliador(userDetails.getUsername());
         return avaliacaoService.salvar(dto);
     }
+
 
     // Endpoint para admin visualizar todas as avaliações
     @PreAuthorize("hasRole('ADMIN')")

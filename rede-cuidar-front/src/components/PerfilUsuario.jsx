@@ -158,7 +158,7 @@ const PerfilUsuario = () => {
       </Box>
 
       <Box textAlign="center" mt={3} display="flex" justifyContent="center" gap={2}>
-        <Button variant="contained" component={Link} to="/servicos">Voltar</Button>
+        <Button variant="contained" component={Link} to="/servicos">Buscar Mais Profissionais</Button>
         {usuario.telefone && (
           <Button
             variant="outlined"

@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import {
   TextField,
   Button,
@@ -34,53 +34,54 @@ const Login = () => {
     senha: Yup.string().required('Senha é obrigatória'),
   });
 
-  const handleSubmit = async (values) => {
-    setLoading(true);
-    setError('');
+    const handleSubmit = async (values) => {
+      setLoading(true);
+      setError('');
 
-    const captchaToken = recaptchaRef.current?.getValue();
-    if (!captchaToken) {
-      setError('Por favor, confirme que você não é um robô.');
-      setLoading(false);
-      return;
-    }
+      const captchaToken = recaptchaRef.current?.getValue();
+      if (!captchaToken) {
+        setError('Por favor, confirme que você não é um robô.');
+        setLoading(false);
+        return;
+      }
 
-    try {
-      const formData = new URLSearchParams();
-      formData.append('email', values.email);
-      formData.append('senha', values.senha);
-      formData.append('captchaToken', captchaToken);
+      try {
+        const payload = {
+          email: values.email,
+          senha: values.senha,
+          captchaToken: captchaToken,
 
-      const response = await fetch('http://localhost:8080/api/auth/login', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: formData.toString(),
-      });
+        };
 
-      const texto = await response.text();
+        const response = await fetch('http://localhost:8080/api/auth/login', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
 
-    if (response.ok) {
-      const isAdmin = values.email.trim().toLowerCase() === 'admin@redecuidar.com';
+        const texto = await response.text();
 
-      localStorage.setItem('token', 'logado');
-      localStorage.setItem('email', values.email);
-      localStorage.setItem('isAdmin', isAdmin.toString());
+        if (response.ok) {
+          const isAdmin = values.email.trim().toLowerCase() === 'admin@redecuidar.com';
 
+          localStorage.setItem('token', 'logado');
+          localStorage.setItem('email', values.email);
+          localStorage.setItem('isAdmin', isAdmin.toString());
 
-      window.dispatchEvent(new Event('authChange'));
-      navigate(isAdmin ? '/admin' : '/');
-    }
-     else {
-            throw new Error(texto || 'Credenciais inválidas');
-          }
-        } catch (error) {
-          setError(error.message);
-        } finally {
-          setLoading(false);
-          recaptchaRef.current?.reset();
+          window.dispatchEvent(new Event('authChange'));
+          navigate(isAdmin ? '/admin' : '/');
+        } else {
+          throw new Error(texto || 'Credenciais inválidas');
         }
-      };
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+        recaptchaRef.current?.reset();
+      }
+    };
+
 
       const textFieldStyles = {
         backgroundColor: theme.palette.mode === 'dark' ? '#333' : '#fff',
@@ -183,6 +184,14 @@ const Login = () => {
               >
                 {loading ? <CircularProgress size={24} /> : 'Entrar'}
               </Button>
+
+              <Box sx={{ mt: 2, textAlign: 'center' }}>
+                <Link component={RouterLink} to="/esqueci-senha" variant="body2">
+                  Esqueci minha senha
+                </Link>
+              </Box>
+
+
             </Form>
           )}
         </Formik>

@@ -10,8 +10,12 @@ import {
   Typography,
   CircularProgress,
   Alert,
-  TextField
+  TextField,
+  IconButton,
+  InputAdornment
 } from '@mui/material';
+
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const AdminPage = () => {
   const navigate = useNavigate();
@@ -23,6 +27,9 @@ const AdminPage = () => {
   const [adminPassword, setAdminPassword] = useState('');
   const [deleteError, setDeleteError] = useState('');
   const [deleting, setDeleting] = useState(false);
+
+  const [showPassword, setShowPassword] = useState(false);
+
 
   useEffect(() => {
     console.log("Comentários recebidos:", comentarios)
@@ -212,12 +219,24 @@ const AdminPage = () => {
           />
           <TextField
             label="Senha do administrador"
-            type="password"
+            type={showPassword ? "text" : "password"}
             fullWidth
             margin="normal"
             value={adminPassword}
             onChange={(e) => setAdminPassword(e.target.value)}
             disabled={deleting}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
           {deleteError && <Alert severity="error" sx={{ mt: 2 }}>{deleteError}</Alert>}
         </DialogContent>

@@ -69,32 +69,89 @@ const Navbar = () => {
   const desktopMenu = (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
       {location.pathname !== '/' && !isAdmin && (
-        <Button component={Link} to="/" sx={{ color: textColor, textTransform: 'none' }}>
+        <Button
+          component={Link}
+          to="/"
+          sx={{
+            color: textColor,
+            textTransform: 'none',
+            fontWeight: 'normal',
+            '&:hover': {
+              fontWeight: 'bold',
+              textDecoration: 'none',
+            }
+          }}
+        >
           Início
         </Button>
       )}
 
-
       {!isLoggedIn ? (
         <>
-          <Button component={Link} to="/login" sx={{ color: textColor, textTransform: 'none' }}>
-            Login
-          </Button>
-          <Button component={Link} to="/cadastro" sx={{ color: textColor, textTransform: 'none' }}>
-            Cadastre-se
-          </Button>
+          {location.pathname !== '/login' && (
+            <Button
+              component={Link}
+              to="/login"
+              sx={{
+                color: textColor,
+                textTransform: 'none',
+                fontWeight: 'normal',
+                '&:hover': {
+                  fontWeight: 'bold',
+                  textDecoration: 'none',
+                }
+              }}
+            >
+              Login
+            </Button>
+          )}
+          {location.pathname !== '/cadastro' && (
+            <Button
+              component={Link}
+              to="/cadastro"
+              sx={{
+                color: textColor,
+                textTransform: 'none',
+                fontWeight: 'normal',
+                '&:hover': {
+                  fontWeight: 'bold',
+                  textDecoration: 'none',
+                }
+              }}
+            >
+              Cadastre-se
+            </Button>
+          )}
         </>
       ) : isAdmin ? (
-        <>
-          {/* Para admin: só Sair */}
-          <Button onClick={handleLogout} sx={{ color: textColor, textTransform: 'none' }}>
-            Sair
-          </Button>
-        </>
+        <Button
+          onClick={handleLogout}
+          sx={{
+            color: textColor,
+            textTransform: 'none',
+            fontWeight: 'normal',
+            '&:hover': {
+              fontWeight: 'bold',
+              textDecoration: 'none',
+            }
+          }}
+        >
+          Sair
+        </Button>
       ) : (
         <>
-          {/* Usuário normal */}
-          <Button onClick={handleMenuOpen} sx={{ color: textColor, textTransform: 'none' }}>
+          <Button
+            onClick={handleMenuOpen}
+            sx={{
+              color: textColor,
+              textTransform: 'none',
+              fontWeight: 'normal',
+              '&:hover': {
+                fontWeight: 'bold',
+                textDecoration: 'none',
+              }
+            }}
+          >
             Minha Conta {nomeUsuario}
           </Button>
           <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
@@ -103,10 +160,26 @@ const Navbar = () => {
                 handleMenuClose();
                 navigate('/perfil');
               }}
+              sx={{
+                '&:hover': {
+                  fontWeight: 'bold',
+                  backgroundColor: theme.palette.action.hover,
+                }
+              }}
             >
               Perfil
             </MenuItem>
-            <MenuItem onClick={handleLogout}>Sair</MenuItem>
+            <MenuItem
+              onClick={handleLogout}
+              sx={{
+                '&:hover': {
+                  fontWeight: 'bold',
+                  backgroundColor: theme.palette.action.hover,
+                }
+              }}
+            >
+              Sair
+            </MenuItem>
           </Menu>
         </>
       )}
@@ -117,7 +190,9 @@ const Navbar = () => {
           sx={{
             color: textColor,
             transition: 'transform 0.3s ease',
-            '&:hover': { transform: 'rotate(20deg)' },
+            '&:hover': {
+              transform: 'rotate(20deg)',
+            }
           }}
         >
           {mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
@@ -128,18 +203,23 @@ const Navbar = () => {
 
   const mobileMenu = (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-     {location.pathname !== '/' && !isAdmin && (
-       <IconButton
-         component={Link}
-         to="/"
-         sx={{ color: textColor, mr: 1 }}
-         aria-label="Início"
-         size="large"
-       >
-         <HomeIcon />
-       </IconButton>
-     )}
-
+      {location.pathname !== '/' && !isAdmin && (
+        <IconButton
+          component={Link}
+          to="/"
+          sx={{
+            color: textColor,
+            mr: 1,
+            '&:hover': {
+              transform: 'scale(1.1)',
+            }
+          }}
+          aria-label="Início"
+          size="large"
+        >
+          <HomeIcon />
+        </IconButton>
+      )}
 
       <IconButton edge="end" color="inherit" aria-label="menu" onClick={() => setDrawerOpen(true)}>
         <MenuIcon />
@@ -159,33 +239,92 @@ const Navbar = () => {
           <List>
             {!isLoggedIn ? (
               <>
-                <ListItem component={Link} to="/login">
-                  <ListItemText primary="Login" sx={{ color: theme.palette.text.primary }} />
-                </ListItem>
-                <ListItem component={Link} to="/cadastro">
-                  <ListItemText primary="Cadastre-se" sx={{ color: theme.palette.text.primary }} />
-                </ListItem>
+                {location.pathname !== '/login' && (
+                  <ListItem component={Link} to="/login">
+                    <ListItemText
+                      primary="Login"
+                      sx={{
+                        color: theme.palette.text.primary,
+                        '&:hover': {
+                          fontWeight: 'bold',
+                          textDecoration: 'none',
+                          cursor: 'pointer',
+                        }
+                      }}
+                    />
+                  </ListItem>
+                )}
+                {location.pathname !== '/cadastro' && (
+                  <ListItem component={Link} to="/cadastro">
+                    <ListItemText
+                      primary="Cadastre-se"
+                      sx={{
+                        color: theme.palette.text.primary,
+                        '&:hover': {
+                          fontWeight: 'bold',
+                          textDecoration: 'none',
+                          cursor: 'pointer',
+                        }
+                      }}
+                    />
+                  </ListItem>
+                )}
               </>
             ) : isAdmin ? (
-              <>
-                <ListItem onClick={handleLogout}>
-                  <ListItemText primary="Sair" sx={{ color: theme.palette.text.primary }} />
-                </ListItem>
-              </>
+              <ListItem onClick={handleLogout}>
+                <ListItemText
+                  primary="Sair"
+                  sx={{
+                    color: theme.palette.text.primary,
+                    '&:hover': {
+                      fontWeight: 'bold',
+                      textDecoration: 'none',
+                      cursor: 'pointer',
+                    }
+                  }}
+                />
+              </ListItem>
             ) : (
               <>
                 <ListItem onClick={() => navigate('/perfil')}>
-                  <ListItemText primary="Perfil" sx={{ color: theme.palette.text.primary }} />
+                  <ListItemText
+                    primary="Perfil"
+                    sx={{
+                      color: theme.palette.text.primary,
+                      '&:hover': {
+                        fontWeight: 'bold',
+                        textDecoration: 'none',
+                        cursor: 'pointer',
+                      }
+                    }}
+                  />
                 </ListItem>
                 <ListItem onClick={handleLogout}>
-                  <ListItemText primary="Sair" sx={{ color: theme.palette.text.primary }} />
+                  <ListItemText
+                    primary="Sair"
+                    sx={{
+                      color: theme.palette.text.primary,
+                      '&:hover': {
+                        fontWeight: 'bold',
+                        textDecoration: 'none',
+                        cursor: 'pointer',
+                      }
+                    }}
+                  />
                 </ListItem>
               </>
             )}
             <ListItem onClick={toggleTheme}>
               <ListItemText
                 primary={mode === 'dark' ? 'Tema Claro' : 'Tema Escuro'}
-                sx={{ color: theme.palette.text.primary }}
+                sx={{
+                  color: theme.palette.text.primary,
+                  '&:hover': {
+                    fontWeight: 'bold',
+                    textDecoration: 'none',
+                    cursor: 'pointer',
+                  }
+                }}
               />
             </ListItem>
           </List>

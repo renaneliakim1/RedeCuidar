@@ -3,18 +3,9 @@ package com.redecuidar.dto;
 public class LoginDto {
     private String email;
     private String senha;
+    private String captchaToken;
 
-    // Construtor padrão
-    public LoginDto() {
-    }
-
-    // Construtor com campos
-    public LoginDto(String email, String senha) {
-        this.email = email;
-        this.senha = senha;
-    }
-
-    // Getters e Setters
+    // GETTERS e SETTERS obrigatórios
     public String getEmail() {
         return email;
     }
@@ -31,12 +22,11 @@ public class LoginDto {
         this.senha = senha;
     }
 
-    // Método toString (opcional, mas útil para logging)
-    @Override
-    public String toString() {
-        return "LoginDto{" +
-                "email='" + email + '\'' +
-                ", senha='[PROTECTED]'" +
-                '}';
+    public String getCaptchaToken() {
+        return captchaToken;
+    }
+
+    public void setCaptchaToken(String captchaToken) {
+        this.captchaToken = captchaToken;
     }
 }
