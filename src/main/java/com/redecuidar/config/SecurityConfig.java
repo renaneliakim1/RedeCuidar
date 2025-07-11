@@ -57,6 +57,7 @@ public class SecurityConfig {
 
                         .requestMatchers("/uploads/fotos-perfil/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/avaliacoes").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/usuarios/**").authenticated()
 
 
                         // Protegidos (exemplo: POST em avaliações)

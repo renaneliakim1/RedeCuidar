@@ -104,6 +104,7 @@ const AdminPage = () => {
     try {
       const res = await fetch(`http://localhost:8080/usuarios/${userToDelete.id}`, {
         method: 'DELETE',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ adminPassword }),
       });
