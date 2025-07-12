@@ -186,7 +186,7 @@ const Home = () => {
       </Box>
 
       {/* 🔷 Profissionais em destaque */}
-      <Typography variant="h5" sx={{ mt: 8, mb: 4, fontWeight: 600 }}>
+      <Typography variant="h6" sx={{ mt: 8, mb: 4, fontWeight: 600 }}>
         Profissionais em destaque
       </Typography>
 
@@ -286,7 +286,8 @@ const Home = () => {
               display: 'flex',
               flexDirection: {
                 xs: 'column',
-                sm: index % 2 === 0 ? 'row' : 'row-reverse'
+                sm: index % 2 === 0 ? 'row' : 'row-reverse',
+
               },
               height: { xs: 'auto', sm: 200 },
               borderRadius: 2,
@@ -310,7 +311,7 @@ const Home = () => {
                 width: '100%',
                 padding: 2
               }}>
-                <Typography variant="h6" fontWeight={600} gutterBottom>{item.titulo}</Typography>
+                <Typography variant="h5" fontWeight={600} gutterBottom>{item.titulo}</Typography>
                 <Typography variant="body2" color="text.secondary">{item.descricao}</Typography>
               </CardContent>
             </Card>
