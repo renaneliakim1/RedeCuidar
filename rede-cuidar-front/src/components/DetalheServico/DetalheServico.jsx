@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { getServico } from '../services/servicoService';
+import { getServico } from '../../services/servicoService';
 
 const DetalheServico = () => {
   const { id } = useParams();

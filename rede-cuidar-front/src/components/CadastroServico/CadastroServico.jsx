@@ -15,8 +15,8 @@ import {
   Autocomplete,
   useTheme
 } from '@mui/material';
-import { createServico } from '../services/servicoService';
-import { getPrestadores } from '../services/usuarioService';
+import { createServico } from '../../services/servicoService';
+import { getPrestadores } from '../../services/usuarioService';
 
 const categoriasOptions = [
   { value: 'CUIDADOS_PESSOAIS', label: 'Cuidados Pessoais' },

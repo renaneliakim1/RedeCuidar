@@ -198,9 +198,9 @@ const PerfilUsuario = () => {
               icon={<Work />}
             />
 
-            <Typography variant="body1" sx={{ mb: 3 }}>
+           {/*  <Typography variant="body1" sx={{ mb: 3 }}>
               {usuario.descricaoServico || 'Descrição não informada'}
-            </Typography>
+            </Typography> */}
 
             <Box sx={{
               bgcolor: theme.palette.mode === 'light' ? '#f5f5f5' : '#1e1e1e',

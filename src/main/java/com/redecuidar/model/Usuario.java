@@ -59,7 +59,7 @@ public class Usuario implements UserDetails {
         BABA,
         ENFERMEIRO,
         FISIOTERAPEUTA,
-        MEDICO,
+        MASSAGISTA,
         PSICOLOGO,
         NUTRICIONISTA,
         BARBEIRO_A_DOMICILIO,

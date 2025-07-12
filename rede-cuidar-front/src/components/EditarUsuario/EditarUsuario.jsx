@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { getUsuario, updateUsuario } from '../services/usuarioService';
+import { getUsuario, updateUsuario } from '../../services/usuarioService';
 
 const gruposOptions = [
   { value: 'MULHER', label: 'Mulher' },
@@ -35,7 +35,7 @@ const especialidadesOptions = [
   { value: 'BABA', label: 'Babá' },
   { value: 'ENFERMEIRO', label: 'Enfermeiro' },
   { value: 'FISIOTERAPEUTA', label: 'Fisioterapeuta' },
-  { value: 'MEDICO', label: 'Médico' },
+  { value: 'MASSAGISTA', label: 'Massagista' },
   { value: 'PSICOLOGO', label: 'Psicólogo' },
   { value: 'NUTRICIONISTA', label: 'Nutricionista' },
   { value: 'OUTRO', label: 'Outro' },

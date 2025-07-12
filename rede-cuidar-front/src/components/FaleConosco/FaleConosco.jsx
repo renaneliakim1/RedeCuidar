@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { motion } from 'framer-motion';
-import contact from '../assets/contact.jpg';
+import contact from '../../assets/contact.jpg';
 
 const FaleConosco = () => {
   const formRef = useRef(null);

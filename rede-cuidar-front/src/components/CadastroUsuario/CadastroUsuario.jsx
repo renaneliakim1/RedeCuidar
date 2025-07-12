@@ -30,17 +30,18 @@ const CadastroUsuario = () => {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const Especialidade = {
-    CUIDADOR: 'CUIDADOR',
-    BABA: 'BABA',
-    ENFERMEIRO: 'ENFERMEIRO',
-    FISIOTERAPEUTA: 'FISIOTERAPEUTA',
-    MEDICO: 'MEDICO',
-    PSICOLOGO: 'PSICOLOGO',
-    NUTRICIONISTA: 'NUTRICIONISTA',
-    BARBEIRO_A_DOMICILIO: 'BARBEIRO_A_DOMICILIO',
-    FAXINEIRO: 'FAXINEIRO'
-  };
+  const especialidades = [
+    { value: 'CUIDADOR', label: 'Cuidador(a)' },
+    { value: 'BABA', label: 'Babá' },
+    { value: 'ENFERMEIRO', label: 'Enfermeiro(a)' },
+    { value: 'FISIOTERAPEUTA', label: 'Fisioterapeuta' },
+    { value: 'MASSAGISTA', label: 'Massagista' },
+    { value: 'PSICOLOGO', label: 'Psicólogo(a)' },
+    { value: 'NUTRICIONISTA', label: 'Nutricionista' },
+    { value: 'BARBEIRO_A_DOMICILIO', label: 'Barbeiro(a) a domicílio' },
+    { value: 'FAXINEIRO', label: 'Faxineiro(a)' },
+  ];
+
 
   const validationSchema = Yup.object().shape({
     nome: Yup.string().required('Nome é obrigatório'),
@@ -59,7 +60,9 @@ const CadastroUsuario = () => {
     }),
     descricaoServico: Yup.string().when('ofereceServico', {
       is: true,
-      then: (schema) => schema.required('Descrição é obrigatória'),
+      then: (schema) => schema
+          .required('Descrição é obrigatória')
+          .min(40, 'A descrição deve ter no mínimo 40 caracteres'),
       otherwise: (schema) => schema.notRequired()
     }),
   });
@@ -115,7 +118,7 @@ const CadastroUsuario = () => {
     <Box sx={{ maxWidth: 800, mx: 'auto', py: 5 }}>
       <Paper elevation={3} sx={{ p: 4 }}>
         <Typography variant="h4" textAlign="center" gutterBottom fontWeight={600}>
-          Cadastro de Usuário
+          Cadastro
         </Typography>
 
         {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
@@ -223,7 +226,7 @@ const CadastroUsuario = () => {
                     onChange={handleChange}
                   />
                 }
-                label="Ofereço serviços de cuidado"
+                label="Ofereçe serviços de cuidado? Marque aqui! "
               />
 
               {values.ofereceServico && (
@@ -238,13 +241,14 @@ const CadastroUsuario = () => {
                       onChange={handleChange}
                       error={touched.especialidade && !!errors.especialidade}
                     >
-                      {Object.entries(Especialidade).map(([key, value]) => (
-                        <MenuItem key={value} value={value}>
-                          {key.toLowerCase().replace(/_/g, ' ')}
+                      {especialidades.map((item) => (
+                        <MenuItem key={item.value} value={item.value}>
+                          {item.label}
                         </MenuItem>
                       ))}
                     </Field>
                   </FormControl>
+
 
                   <Field
                     as={TextField}

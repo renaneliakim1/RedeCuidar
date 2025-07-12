@@ -21,8 +21,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import HomeIcon from '@mui/icons-material/Home';
-import { useThemeContext } from './ThemeContext';
-import logo02 from '../assets/logo02.png';
+import { useThemeContext } from '../ThemeContext/ThemeContext';
+import logo02 from '../../assets/logo02.png';
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -81,7 +81,7 @@ const Navbar = () => {
       color: theme.palette.text.primary,
       '&:hover': {
         color: '#01E0CD',
-        fontWeight: 'bold',
+        fontWeight: '600',
         cursor: 'pointer',
       },
     };
@@ -137,8 +137,6 @@ const Navbar = () => {
           Sair
         </MenuItem>
 
-
-
           </Menu>
         </>
       )}
@@ -175,7 +173,7 @@ const Navbar = () => {
               <>
                 {location.pathname !== '/login' && (
                   <ListItem component={Link} to="/login">
-                    <ListItemText primary="Login" sx={drawerItemStyle} />
+                    <ListItemText primary="Login" sx={drawerItemStyle}  />
                   </ListItem>
                 )}
                 {location.pathname !== '/cadastro' && (
@@ -212,7 +210,7 @@ const Navbar = () => {
     <AppBar position="static" color="primary">
       <Toolbar sx={{ justifyContent: 'space-between' }}>
         <Box component={Link} to="/" sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-          <Box component="img" src={logo02} alt="Rede Cuidar" sx={{ height: 40, objectFit: 'contain' }} />
+          <Box component="img" src={logo02} alt="Rede Cuidar" sx={{ height: 50, objectFit: 'contain' }} />
         </Box>
         {isMobile ? mobileMenu : desktopMenu}
       </Toolbar>

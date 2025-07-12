@@ -14,14 +14,14 @@ import "slick-carousel/slick/slick-theme.css";
 import Typed from 'typed.js';
 
 // Imagens
-import cuidados from '../assets/cuidados.jpg';
-import saudemental from '../assets/saudemental.jpg';
-import educacao from '../assets/educacao.jpg';
-import fisioterapia from '../assets/fisioterapia.jpg';
-import fundoHome from '../assets/home.jpg';
-import grupodeidosos from '../assets/grupodeidosos.jpg';
-import psicologa from '../assets/psicologa.jpg';
-import cadeirante from '../assets/cadeirante.jpg';
+import cuidados from '../../assets/cuidados.jpg';
+import saudemental from '../../assets/saudemental.jpg';
+import educacao from '../../assets/educacao.jpg';
+import fisioterapia from '../../assets/fisioterapia.jpg';
+import fundoHome from '../../assets/home.jpg';
+import grupodeidosos from '../../assets/grupodeidosos.jpg';
+import psicologa from '../../assets/psicologa.jpg';
+import cadeirante from '../../assets/cadeirante.jpg';
 
 const BluePrevArrow = (props) => (
   <IconButton onClick={props.onClick} sx={{
@@ -204,9 +204,14 @@ const Home = () => {
                   <Typography variant="subtitle1" fontWeight="bold">{usuario.nome}</Typography>
                   <Typography variant="body2" color="text.secondary">{usuario.especialidade}</Typography>
                   <Typography variant="body2">{usuario.bairro}, {usuario.cidade} - {usuario.estado}</Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1, maxHeight: 50, overflow: 'hidden' }}>
-                    {usuario.descricaoServico || 'Sem descrição'}
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    {usuario.descricaoServico
+                      ? usuario.descricaoServico.length > 40
+                        ? `${usuario.descricaoServico.slice(0, 40)}...`
+                        : usuario.descricaoServico
+                      : 'Sem descrição'}
                   </Typography>
+
                 </CardContent>
                 <Box
                   sx={{

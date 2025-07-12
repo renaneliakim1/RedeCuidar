@@ -17,19 +17,21 @@ const Footer = () => {
         textAlign: 'center',
       }}
     >
-      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 3, mb: 1 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 3, mb: 1, flexWrap: 'wrap' }}>
         <Link
           component={RouterLink}
           to="/quem-somos"
-          underline="hover"
+          underline="none"
           color="inherit"
           sx={{
-            fontWeight: 'normal',
+            fontWeight: '700',
             cursor: 'pointer',
-            transition: 'all 0.3s ease',
+            transition: 'color 0.3s ease, text-decoration 0.3s ease',
             '&:hover': {
-              fontWeight: 'bold',
+              color: theme.palette.secondary.main,
               textDecoration: 'none',
+              color: '#01E0CD',
+
             }
           }}
         >
@@ -39,19 +41,41 @@ const Footer = () => {
         <Link
           component={RouterLink}
           to="/fale-conosco"
-          underline="hover"
+          underline="none"
           color="inherit"
           sx={{
-            fontWeight: 'normal',
+            fontWeight: '700',
             cursor: 'pointer',
-            transition: 'all 0.3s ease',
+            transition: 'color 0.3s ease, textDecoration 0.3s ease',
             '&:hover': {
-              fontWeight: 'bold',
+              color: theme.palette.secondary.main,
               textDecoration: 'none',
+              color: '#01E0CD',
+
             }
           }}
         >
           Fale Conosco
+        </Link>
+
+        <Link
+          component={RouterLink}
+          to="/politicas-privacidade"
+          underline="none"
+          color="inherit"
+          sx={{
+            fontWeight: '700',
+            cursor: 'pointer',
+            transition: 'color 0.3s ease, textDecoration 0.3s ease',
+            '&:hover': {
+              color: theme.palette.secondary.main,
+              textDecoration: 'none',
+              color: '#01E0CD',
+
+            }
+          }}
+        >
+          Políticas de Privacidade
         </Link>
       </Box>
 

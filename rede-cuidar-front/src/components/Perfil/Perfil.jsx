@@ -34,7 +34,7 @@ const Especialidade = {
   BABA: 'Babá',
   ENFERMEIRO: 'Enfermeiro',
   FISIOTERAPEUTA: 'Fisioterapeuta',
-  MEDICO: 'Médico',
+  MASSAGISTA: 'Massagista',
   PSICOLOGO: 'Psicólogo',
   NUTRICIONISTA: 'Nutricionista',
   BARBEIRO_A_DOMICILIO: 'Barbeiro(a) a domicílio',

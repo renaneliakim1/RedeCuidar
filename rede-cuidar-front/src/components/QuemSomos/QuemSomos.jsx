@@ -7,6 +7,7 @@ const QuemSomos = () => {
       <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
         <Typography variant="h4" component="h1" gutterBottom fontWeight={700} align="center">
           Quem Somos
+
         </Typography>
 
         <Typography variant="body1" paragraph>
