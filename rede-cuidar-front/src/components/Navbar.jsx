@@ -71,17 +71,21 @@ const Navbar = () => {
     px: 2,
     backgroundColor: 'transparent',
     '&:hover': {
-      color: theme.palette.mode === 'light' ? '#0d47a1' : '#64b5f6',
+      color: '#01E0CD',
+      fontWeight: 600
     },
   };
 
-  const drawerItemStyle = {
-    color: theme.palette.text.primary,
-    '&:hover': {
-      fontWeight: 'bold',
-      cursor: 'pointer',
-    },
-  };
+
+    const drawerItemStyle = {
+      color: theme.palette.text.primary,
+      '&:hover': {
+        color: '#01E0CD',
+        fontWeight: 'bold',
+        cursor: 'pointer',
+      },
+    };
+
 
   const desktopMenu = (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -104,36 +108,35 @@ const Navbar = () => {
         <>
           <Button onClick={handleMenuOpen} sx={navButtonStyle}>Minha Conta {nomeUsuario}</Button>
           <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-            <MenuItem
-              onClick={() => { handleMenuClose(); navigate('/perfil'); }}
-              sx={{
-                color: theme.palette.text.primary,
-                fontWeight: 600,
-                backgroundColor: 'transparent',
-                '&:hover': {
-                  backgroundColor: 'transparent',
-                  color: theme.palette.mode === 'light' ? '#0d47a1' : '#64b5f6',
-                  textDecoration: 'none',
-                },
-              }}
-            >
-              Perfil
-            </MenuItem>
-            <MenuItem
-              onClick={handleLogout}
-              sx={{
-                color: theme.palette.text.primary,
-                fontWeight: 600,
-                backgroundColor: 'transparent',
-                '&:hover': {
-                  backgroundColor: 'transparent',
-                  color: theme.palette.mode === 'light' ? '#0d47a1' : '#64b5f6',
-                  textDecoration: 'none',
-                },
-              }}
-            >
-              Sair
-            </MenuItem>
+        <MenuItem
+          onClick={() => { handleMenuClose(); navigate('/perfil'); }}
+          sx={{
+            color: theme.palette.text.primary,
+            fontWeight: 600,
+            backgroundColor: 'transparent',
+            '&:hover': {
+              backgroundColor: 'transparent',
+              color: '#01E0CD',
+            },
+          }}
+        >
+          Perfil
+        </MenuItem>
+        <MenuItem
+          onClick={handleLogout}
+          sx={{
+            color: theme.palette.text.primary,
+            fontWeight: 600,
+            backgroundColor: 'transparent',
+            '&:hover': {
+              backgroundColor: 'transparent',
+              color: '#01E0CD',
+            },
+          }}
+        >
+          Sair
+        </MenuItem>
+
 
 
           </Menu>
