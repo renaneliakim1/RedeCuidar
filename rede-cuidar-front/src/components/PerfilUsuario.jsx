@@ -1,7 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Container, Typography, Box, Button, Avatar, CircularProgress, Alert, TextField } from '@mui/material';
-import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+import {
+  Container,
+  Typography,
+  Box,
+  Button,
+  Avatar,
+  CircularProgress,
+  Alert,
+  TextField,
+  Divider,
+  Chip,
+  Paper,
+  useTheme,
+  Rating
+} from '@mui/material';
+import {
+  WhatsApp,
+  Email,
+  Phone,
+  LocationOn,
+  Work,
+  Star
+} from '@mui/icons-material';
 
 const formatarEspecialidade = (valor) => {
   if (!valor) return 'Não informado';
@@ -19,10 +40,13 @@ const PerfilUsuario = () => {
   const [novaAvaliacao, setNovaAvaliacao] = useState('');
   const [avaliacoes, setAvaliacoes] = useState([]);
   const [enviando, setEnviando] = useState(false);
+/*
+  const [notaAvaliacao, setNotaAvaliacao] = useState(5);
+ */
+  const theme = useTheme();
 
   const usuarioLogadoEmail = localStorage.getItem("email");
 
-  // Buscar dados do usuário
   useEffect(() => {
     const fetchUsuario = async () => {
       try {
@@ -39,7 +63,6 @@ const PerfilUsuario = () => {
     fetchUsuario();
   }, [id]);
 
-  // Buscar avaliações
   useEffect(() => {
     const fetchAvaliacoes = async () => {
       try {
@@ -69,14 +92,23 @@ const PerfilUsuario = () => {
         credentials: 'include',
         body: JSON.stringify({
           idAvaliado: usuario.id,
-          comentario: novaAvaliacao.trim()
+          comentario: novaAvaliacao.trim(),
+/*
+          nota: notaAvaliacao
+ */
         })
       });
 
       if (!response.ok) throw new Error('Erro ao enviar avaliação');
 
+
+/*
       setNovaAvaliacao('');
-      // Atualiza avaliações
+
+      setNotaAvaliacao(5);
+ */
+
+
       const res = await fetch(`http://localhost:8080/avaliacoes/usuario/${id}`, {
         credentials: 'include',
       });
@@ -92,19 +124,17 @@ const PerfilUsuario = () => {
 
   if (loading) {
     return (
-      <Container sx={{ mt: 6, textAlign: 'center' }}>
-        <CircularProgress />
-      </Container>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress size={80} />
+      </Box>
     );
   }
 
   if (erro) {
     return (
       <Container sx={{ mt: 6 }}>
-        <Alert severity="error">{erro}</Alert>
-        <Box mt={2}>
-          <Button variant="contained" component={Link} to="/servicos">Voltar</Button>
-        </Box>
+        <Alert severity="error" sx={{ mb: 2 }}>{erro}</Alert>
+        <Button variant="contained" component={Link} to="/servicos">Voltar</Button>
       </Container>
     );
   }
@@ -112,104 +142,227 @@ const PerfilUsuario = () => {
   if (!usuario) {
     return (
       <Container sx={{ mt: 6 }}>
-        <Alert severity="info">Usuário não encontrado.</Alert>
-        <Box mt={2}>
-          <Button variant="contained" component={Link} to="/servicos">Voltar</Button>
-        </Box>
+        <Alert severity="info" sx={{ mb: 2 }}>Usuário não encontrado</Alert>
+        <Button variant="contained" component={Link} to="/servicos">Voltar</Button>
       </Container>
     );
   }
 
-  const formatarData = (dataISO) => {
-    const data = new Date(dataISO);
-    return data.toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
   return (
-    <Container maxWidth="sm" sx={{ mt: 4 }}>
-      <Typography variant="h4" gutterBottom textAlign="center">
-        Perfil do Usuário
-      </Typography>
-
-      <Box display="flex" justifyContent="center" mb={3}>
-        <Avatar
-          src={usuario.fotoPerfil ? `http://localhost:8080/uploads/fotos-perfil/${usuario.fotoPerfil}` : undefined}
-          alt={usuario.nome}
-          sx={{ width: 150, height: 150 }}
-        />
-      </Box>
-
-      <Box sx={{ mb: 2 }}>
-        <Typography variant="body1"><strong>Nome:</strong> {usuario.nome}</Typography>
-        <Typography variant="body1"><strong>Email:</strong> {usuario.email}</Typography>
-        <Typography variant="body1"><strong>Telefone:</strong> {usuario.telefone || '-'}</Typography>
-        <Typography variant="body1"><strong>CEP:</strong> {usuario.cep || '-'}</Typography>
-        <Typography variant="body1"><strong>Bairro:</strong> {usuario.bairro || '-'}</Typography>
-        <Typography variant="body1"><strong>Cidade:</strong> {usuario.cidade || '-'}</Typography>
-        <Typography variant="body1"><strong>Estado:</strong> {usuario.estado || '-'}</Typography>
-        <Typography variant="body1"><strong>Especialidade:</strong> {formatarEspecialidade(usuario.especialidade)}</Typography>
-        <Typography variant="body1"><strong>Descrição do Serviço:</strong> {usuario.descricaoServico || 'Sem descrição'}</Typography>
-      </Box>
-
-      <Box textAlign="center" mt={3} display="flex" justifyContent="center" gap={2}>
-        <Button variant="contained" component={Link} to="/servicos">Buscar Mais Profissionais</Button>
-        {usuario.telefone && (
-          <Button
-            variant="outlined"
-            color="success"
-            startIcon={<WhatsAppIcon />}
-            href={`https://wa.me/55${usuario.telefone.replace(/\D/g, '')}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            WhatsApp
-          </Button>
-        )}
-      </Box>
-
-      {usuarioLogadoEmail && usuarioLogadoEmail !== usuario.email && (
-        <Box mt={4}>
-          <Typography variant="h6" gutterBottom>Avaliar este profissional</Typography>
-          <TextField
-            fullWidth
-            multiline
-            rows={4}
-            label="Escreva sua avaliação"
-            value={novaAvaliacao}
-            onChange={(e) => setNovaAvaliacao(e.target.value)}
+    <Container maxWidth="lg" sx={{ py: 6 }}>
+      {/* Removido Paper com elevation/sombra */}
+      <Box sx={{
+        borderRadius: 4,
+        overflow: 'hidden',
+        position: 'relative',
+        bgcolor: 'background.paper'
+      }}>
+        {/* Cabeçalho com foto de capa */}
+        <Box sx={{
+          height: 200,
+          bgcolor: theme.palette.mode === 'light' ? '#e3f2fd' : '#0d47a1',
+          position: 'relative'
+        }}>
+          <Avatar
+            src={usuario.fotoPerfil ? `http://localhost:8080/uploads/fotos-perfil/${usuario.fotoPerfil}` : undefined}
+            alt={usuario.nome}
+            sx={{
+              width: 150,
+              height: 150,
+              border: '4px solid white',
+              position: 'absolute',
+              bottom: -75,
+              left: 40,
+            }}
           />
-          <Box mt={2}>
+        </Box>
+
+        {/* Corpo do perfil */}
+        <Box sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          p: 4,
+          pt: 10,
+          gap: 4
+        }}>
+          {/* Coluna esquerda - Informações básicas */}
+          <Box sx={{ width: { md: '35%' } }}>
+            <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+              {usuario.nome}
+            </Typography>
+
+            <Chip
+              label={formatarEspecialidade(usuario.especialidade) || 'Profissional'}
+              color="primary"
+              sx={{ mb: 3 }}
+              icon={<Work />}
+            />
+
+            <Typography variant="body1" sx={{ mb: 3 }}>
+              {usuario.descricaoServico || 'Descrição não informada'}
+            </Typography>
+
+            <Box sx={{
+              bgcolor: theme.palette.mode === 'light' ? '#f5f5f5' : '#1e1e1e',
+              p: 3,
+              borderRadius: 2,
+              mb: 3
+            }}>
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                Informações de Contato
+              </Typography>
+
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                <Email color="primary" sx={{ mr: 1.5 }} />
+                <Typography>{usuario.email || 'Não informado'}</Typography>
+              </Box>
+
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                <Phone color="primary" sx={{ mr: 1.5 }} />
+                <Typography>{usuario.telefone || 'Não informado'}</Typography>
+              </Box>
+
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                <LocationOn color="primary" sx={{ mr: 1.5 }} />
+                <Typography>
+                  {[usuario.bairro, usuario.cidade, usuario.estado].filter(Boolean).join(', ') || 'Não informado'}
+                </Typography>
+              </Box>
+            </Box>
+
+            {usuario.telefone && (
+              <Button
+                variant="contained"
+                color="success"
+                startIcon={<WhatsApp />}
+                fullWidth
+                sx={{ mb: 2 }}
+                href={`https://wa.me/55${usuario.telefone.replace(/\D/g, '')}`}
+                target="_blank"
+              >
+                Contatar via WhatsApp
+              </Button>
+            )}
+
             <Button
-              variant="contained"
-              disabled={enviando || !novaAvaliacao.trim()}
-              onClick={enviarAvaliacao}
+              variant="outlined"
+              fullWidth
+              component={Link}
+              to="/servicos"
             >
-              Enviar Avaliação
+              Voltar para profissionais
             </Button>
           </Box>
-        </Box>
-      )}
 
-      <Box mt={5}>
-        <Typography variant="h6" gutterBottom>Avaliações</Typography>
-        {avaliacoes.length === 0 ? (
-          <Typography variant="body2">Nenhuma avaliação ainda.</Typography>
-        ) : (
-          avaliacoes.map((avaliacao, index) => (
-            <Box key={index} sx={{ p: 2, mb: 2, border: '1px solid #ccc', borderRadius: 2 }}>
-              <Typography variant="subtitle2">
-                <strong>{avaliacao.nomeAvaliador || 'Usuário'}</strong> comentou em {formatarData(avaliacao.dataCriacao)}:
+          {/* Coluna direita - Detalhes profissionais */}
+          <Box sx={{
+            width: { md: '65%' },
+            borderLeft: { md: `1px solid ${theme.palette.divider}` },
+            pl: { md: 4 }
+          }}>
+            {/* Seção de Habilidades */}
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
+                Habilidades e Especialidades
               </Typography>
-              <Typography variant="body1"><strong>{avaliacao.comentario}</strong></Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                {usuario.especialidade ? (
+                  usuario.especialidade.split(',').map((item, index) => (
+                    <Chip
+                      key={index}
+                      label={item.trim()}
+                      variant="outlined"
+                      color="primary"
+                      sx={{ textTransform: 'capitalize' }}
+                    />
+                  ))
+                ) : (
+                  <Typography variant="body2">Nenhuma especialidade informada</Typography>
+                )}
+              </Box>
             </Box>
-          ))
-        )}
+
+            {/* Seção de Sobre */}
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
+                Sobre Mim
+              </Typography>
+              <Typography>
+                {usuario.descricaoServico || 'Nenhuma descrição fornecida.'}
+              </Typography>
+            </Box>
+
+            {/* Seção de Avaliações */}
+            <Box>
+              <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
+                Avaliações ({avaliacoes.length})
+              </Typography>
+
+              {avaliacoes.length === 0 ? (
+                <Typography variant="body2">Nenhuma avaliação ainda.</Typography>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  {avaliacoes.map((avaliacao, index) => (
+                    <Box key={index} sx={{
+                      p: 3,
+                      borderRadius: 2,
+                      bgcolor: theme.palette.mode === 'light' ? '#f5f5f5' : '#1e1e1e'
+                    }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                        {/* <Rating
+                          value={avaliacao.nota || 5}
+                          readOnly
+                          precision={0.5}
+                          emptyIcon={<Star fontSize="inherit" />}
+                        /> */}
+                        <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                          {new Date(avaliacao.dataCriacao).toLocaleDateString('pt-BR')}
+                        </Typography>
+                      </Box>
+                      <Typography variant="body1" sx={{ fontStyle: 'italic', mb: 1 }}>
+                        "{avaliacao.comentario}"
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        — {avaliacao.nomeAvaliador || 'Anônimo'}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              )}
+
+              {/* Formulário de avaliação */}
+              {usuarioLogadoEmail && usuarioLogadoEmail !== usuario.email && (
+                <Box sx={{ mt: 4, p: 3, bgcolor: theme.palette.background.default, borderRadius: 2 }}>
+                  <Typography variant="h6" sx={{ mb: 2 }}>Deixe sua avaliação</Typography>
+                   {/*<Box sx={{ mb: 2 }}>
+                    <Typography component="legend">Nota</Typography>
+                    <Rating
+                      value={notaAvaliacao}
+                      onChange={(event, newValue) => setNotaAvaliacao(newValue)}
+                      precision={1}
+                    />
+                  </Box>*/}
+                  <TextField
+                    multiline
+                    rows={4}
+                    fullWidth
+                    value={novaAvaliacao}
+                    onChange={(e) => setNovaAvaliacao(e.target.value)}
+                    placeholder="Conte sua experiência com este profissional..."
+                    sx={{ mb: 2 }}
+                  />
+                  <Button
+                    variant="contained"
+                    onClick={enviarAvaliacao}
+                    disabled={enviando || !novaAvaliacao.trim()}
+                  >
+                    {enviando ? 'Enviando...' : 'Enviar Avaliação'}
+                  </Button>
+                </Box>
+              )}
+            </Box>
+          </Box>
+        </Box>
       </Box>
     </Container>
   );

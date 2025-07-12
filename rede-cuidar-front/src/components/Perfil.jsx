@@ -14,7 +14,19 @@ import {
   Checkbox,
   CircularProgress,
   Stack,
+  Chip,
+  Divider,
+  Rating,
+  useTheme
 } from '@mui/material';
+import {
+  WhatsApp,
+  Email,
+  Phone,
+  LocationOn,
+  Work,
+  Star
+} from '@mui/icons-material';
 import axios from 'axios';
 
 const Especialidade = {
@@ -37,6 +49,7 @@ const Perfil = () => {
   const [previewFoto, setPreviewFoto] = useState(null);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState('');
+  const theme = useTheme();
 
   useEffect(() => {
     const email = localStorage.getItem('email');
@@ -76,7 +89,7 @@ const Perfil = () => {
   const handleFotoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB
+      if (file.size > 5 * 1024 * 1024) {
         setErro('A imagem deve ter no máximo 5MB.');
         return;
       }
@@ -104,11 +117,10 @@ const Perfil = () => {
         data.append('foto', novaFoto);
       }
 
-        const response = await axios.put(`http://localhost:8080/usuarios/${usuario.id}`, data, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-          withCredentials: true, // 👈 isso faz enviar o cookie JSESSIONID
-        });
-
+      const response = await axios.put(`http://localhost:8080/usuarios/${usuario.id}`, data, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        withCredentials: true,
+      });
 
       setUsuario(response.data);
       setEditando(false);
@@ -116,26 +128,26 @@ const Perfil = () => {
       setPreviewFoto(null);
       setErro('');
     } catch (error) {
-      if (
-        error.response &&
-        error.response.data &&
-        typeof error.response.data === 'string' &&
-        error.response.data.includes('Maximum upload size exceeded')
-      ) {
+      if (error.response?.data?.includes('Maximum upload size exceeded')) {
         setErro('A imagem excede o tamanho máximo permitido (5MB).');
       } else {
-        setErro('Erro! Imagem maior que 5 mb.');
+        setErro('Erro ao atualizar perfil.');
       }
     } finally {
       setLoading(false);
     }
   };
 
- /*  const handleExcluir = async () => {
+  const handleExcluir = async () => {
     if (!window.confirm('Tem certeza que deseja excluir seu perfil?')) return;
     setLoading(true);
+    const email = localStorage.getItem('email');
     try {
-      await axios.delete('http://localhost:8080/usuarios/me', { withCredentials: true });
+      await axios.delete('http://localhost:8080/usuarios/me', {
+        data: { email },
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true,
+      });
       localStorage.clear();
       window.location.href = '/';
     } catch {
@@ -143,38 +155,13 @@ const Perfil = () => {
     } finally {
       setLoading(false);
     }
-  }; */
-
-
-      const handleExcluir = async () => {
-        if (!window.confirm('Tem certeza que deseja excluir seu perfil?')) return;
-        setLoading(true);
-
-        const email = localStorage.getItem('email');
-
-        try {
-            await axios.delete('http://localhost:8080/usuarios/me', {
-              data: { email },
-              headers: { 'Content-Type': 'application/json' },
-              withCredentials: true, // 👈 isso aqui é o que faltava!
-            });
-
-
-          localStorage.clear();
-          window.location.href = '/';
-        } catch {
-          setErro('Erro ao excluir perfil.');
-        } finally {
-          setLoading(false);
-        }
-      };
-
+  };
 
   if (loading) {
     return (
-      <Container sx={{ textAlign: 'center', mt: 8 }}>
-        <CircularProgress />
-      </Container>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress size={80} />
+      </Box>
     );
   }
 
@@ -189,123 +176,306 @@ const Perfil = () => {
   if (!usuario) return null;
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Perfil do Usuário
-      </Typography>
-
-      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-        <Avatar
-          src={previewFoto || (usuario.fotoPerfil ? `http://localhost:8080/uploads/fotos-perfil/${usuario.fotoPerfil}` : '')}
-          alt={usuario.nome}
-          sx={{ width: 150, height: 150 }}
-        />
-      </Box>
-
-      {editando ? (
-        <Box component="form" onSubmit={handleSalvar} noValidate>
-          {erro && (
-            <Typography color="error" sx={{ mb: 2 }}>
-              {erro}
-            </Typography>
-          )}
-
-          <Button variant="outlined" component="label" sx={{ mb: 2 }}>
-            Alterar Foto
-            <input hidden accept="image/*" type="file" onChange={handleFotoChange} />
-          </Button>
-
-          <TextField label="Nome" fullWidth margin="normal" value={formData.nome || ''} onChange={handleInputChange('nome')} required />
-          <TextField label="Email" fullWidth margin="normal" value={formData.email || ''} disabled />
-          <TextField label="Telefone" fullWidth margin="normal" value={formData.telefone || ''} onChange={handleInputChange('telefone')} />
-          <TextField label="CEP" fullWidth margin="normal" value={formData.cep || ''} onChange={(e) => {
-            const cep = e.target.value.replace(/\D/g, '');
-            setFormData({ ...formData, cep });
-            if (cep.length === 8) buscarEnderecoViaCep(cep);
-          }} />
-          <TextField label="Bairro" fullWidth margin="normal" value={formData.bairro || ''} onChange={handleInputChange('bairro')} />
-          <TextField label="Cidade" fullWidth margin="normal" value={formData.cidade || ''} onChange={handleInputChange('cidade')} />
-          <TextField label="Estado" fullWidth margin="normal" value={formData.estado || ''} onChange={handleInputChange('estado')} />
-
-          <FormControlLabel
-            control={<Checkbox checked={formData.ofereceServico || false} onChange={handleInputChange('ofereceServico')} />}
-            label="Oferece serviços?"
+    <Container maxWidth="lg" sx={{ py: 6 }}>
+      <Box sx={{
+        borderRadius: 4,
+        overflow: 'hidden',
+        position: 'relative',
+        bgcolor: 'background.paper'
+      }}>
+        {/* Cabeçalho com foto de capa */}
+        <Box sx={{
+          height: 200,
+          bgcolor: theme.palette.mode === 'light' ? '#e3f2fd' : '#285fb5',
+          position: 'relative'
+        }}>
+          <Avatar
+            src={previewFoto || (usuario.fotoPerfil ? `http://localhost:8080/uploads/fotos-perfil/${usuario.fotoPerfil}` : '')}
+            alt={usuario.nome}
+            sx={{
+              width: 150,
+              height: 150,
+              border: '4px solid white',
+              position: 'absolute',
+              bottom: -75,
+              left: 40,
+            }}
           />
-
-          {formData.ofereceServico && (
-            <>
-              <FormControl fullWidth margin="normal" required>
-                <InputLabel id="especialidade-label">Especialidade</InputLabel>
-                <Select
-                  labelId="especialidade-label"
-                  value={formData.especialidade || ''}
-                  label="Especialidade"
-                  onChange={handleInputChange('especialidade')}
-                >
-                  {Object.entries(Especialidade).map(([key, label]) => (
-                    <MenuItem key={key} value={key}>{label}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <TextField
-                label="Descrição do Serviço"
-                fullWidth
-                margin="normal"
-                multiline
-                minRows={3}
-                value={formData.descricaoServico || ''}
-                onChange={handleInputChange('descricaoServico')}
-              />
-            </>
-          )}
-
-          <Stack direction="row" spacing={2} justifyContent="flex-end" sx={{ mt: 3 }}>
-            <Button variant="contained" color="primary" type="submit" disabled={loading}>
-              Salvar
-            </Button>
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={() => {
-                setEditando(false);
-                setFormData(usuario);
-                setPreviewFoto(null);
-                setNovaFoto(null);
-                setErro('');
-              }}
-            >
-              Cancelar
-            </Button>
-          </Stack>
         </Box>
-      ) : (
-        <>
-          <Typography><strong>Nome:</strong> {usuario.nome}</Typography>
-          <Typography><strong>Email:</strong> {usuario.email}</Typography>
-          <Typography><strong>Telefone:</strong> {usuario.telefone}</Typography>
-          <Typography><strong>CEP:</strong> {usuario.cep}</Typography>
-          <Typography><strong>Bairro:</strong> {usuario.bairro}</Typography>
-          <Typography><strong>Cidade:</strong> {usuario.cidade}</Typography>
-          <Typography><strong>Estado:</strong> {usuario.estado}</Typography>
 
-          {usuario.ofereceServico && (
-            <>
-              <Typography><strong>Especialidade:</strong> {Especialidade[usuario.especialidade]}</Typography>
-              <Typography><strong>Descrição do Serviço:</strong> {usuario.descricaoServico || 'Sem descrição'}</Typography>
-            </>
-          )}
+        {/* Corpo do perfil */}
+        <Box sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          p: 4,
+          pt: 10,
+          gap: 4
+        }}>
+          {/* Coluna esquerda - Informações básicas */}
+          <Box sx={{ width: { md: '35%' } }}>
+            <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+              {usuario.nome}
+            </Typography>
 
-          <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
-            <Button variant="contained" onClick={() => setEditando(true)}>
-              Editar
-            </Button>
-            <Button variant="outlined" color="error" onClick={handleExcluir}>
-              Excluir Perfil
-            </Button>
+            {usuario.ofereceServico && usuario.especialidade && (
+              <Chip
+                label={Especialidade[usuario.especialidade] || 'Profissional'}
+                color="primary"
+                sx={{ mb: 3 }}
+                icon={<Work />}
+              />
+            )}
+
+           {/*  <Typography variant="body1" sx={{ mb: 3 }}>
+              {usuario.descricaoServico || 'Descrição não informada'}
+            </Typography> */}
+
+            <Box sx={{
+              bgcolor: theme.palette.mode === 'light' ? '#f5f5f5' : '#1e1e1e',
+              p: 3,
+              borderRadius: 2,
+              mb: 3
+            }}>
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                Informações de Contato
+              </Typography>
+
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                <Email color="primary" sx={{ mr: 1.5 }} />
+                <Typography>{usuario.email || 'Não informado'}</Typography>
+              </Box>
+
+              {usuario.telefone && (
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                  <Phone color="primary" sx={{ mr: 1.5 }} />
+                  <Typography>{usuario.telefone}</Typography>
+                </Box>
+              )}
+
+              {/* {(usuario.bairro || usuario.cidade || usuario.estado) && (
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                  <LocationOn color="primary" sx={{ mr: 1.5 }} />
+                  <Typography>
+                    {[usuario.bairro, usuario.cidade, usuario.estado].filter(Boolean).join(', ') || 'Não informado'}
+                  </Typography>
+                </Box>
+              )} */}
+            </Box>
+
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <Button
+                variant="contained"
+                onClick={() => setEditando(true)}
+                fullWidth
+              >
+                Editar Perfil
+              </Button>
+
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={handleExcluir}
+                fullWidth
+              >
+                Excluir Perfil
+              </Button>
+            </Box>
           </Box>
-        </>
-      )}
+
+          {/* Coluna direita - Formulário de edição ou detalhes */}
+          <Box sx={{
+            width: { md: '65%' },
+            borderLeft: { md: `1px solid ${theme.palette.divider}` },
+            pl: { md: 4 }
+          }}>
+            {editando ? (
+              <Box component="form" onSubmit={handleSalvar}>
+                {erro && (
+                  <Typography color="error" sx={{ mb: 2 }}>
+                    {erro}
+                  </Typography>
+                )}
+
+                <Button variant="outlined" component="label" sx={{ mb: 3 }}>
+                  Alterar Foto
+                  <input hidden accept="image/*" type="file" onChange={handleFotoChange} />
+                </Button>
+
+                <TextField
+                  label="Nome"
+                  fullWidth
+                  margin="normal"
+                  value={formData.nome || ''}
+                  onChange={handleInputChange('nome')}
+                  required
+                />
+
+                <TextField
+                  label="Email"
+                  fullWidth
+                  margin="normal"
+                  value={formData.email || ''}
+                  disabled
+                />
+
+                <TextField
+                  label="Telefone"
+                  fullWidth
+                  margin="normal"
+                  value={formData.telefone || ''}
+                  onChange={handleInputChange('telefone')}
+                />
+
+                <TextField
+                  label="CEP"
+                  fullWidth
+                  margin="normal"
+                  value={formData.cep || ''}
+                  onChange={(e) => {
+                    const cep = e.target.value.replace(/\D/g, '');
+                    setFormData({ ...formData, cep });
+                    if (cep.length === 8) buscarEnderecoViaCep(cep);
+                  }}
+                />
+
+                <TextField
+                  label="Bairro"
+                  fullWidth
+                  margin="normal"
+                  value={formData.bairro || ''}
+                  onChange={handleInputChange('bairro')}
+                />
+
+                <TextField
+                  label="Cidade"
+                  fullWidth
+                  margin="normal"
+                  value={formData.cidade || ''}
+                  onChange={handleInputChange('cidade')}
+                />
+
+                <TextField
+                  label="Estado"
+                  fullWidth
+                  margin="normal"
+                  value={formData.estado || ''}
+                  onChange={handleInputChange('estado')}
+                />
+
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={formData.ofereceServico || false}
+                      onChange={handleInputChange('ofereceServico')}
+                    />
+                  }
+                  label="Oferece serviços?"
+                  sx={{ mt: 2, mb: 2 }}
+                />
+
+                {formData.ofereceServico && (
+                  <>
+                    <FormControl fullWidth margin="normal" required>
+                      <InputLabel id="especialidade-label">Especialidade</InputLabel>
+                      <Select
+                        labelId="especialidade-label"
+                        value={formData.especialidade || ''}
+                        label="Especialidade"
+                        onChange={handleInputChange('especialidade')}
+                      >
+                        {Object.entries(Especialidade).map(([key, label]) => (
+                          <MenuItem key={key} value={key}>{label}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+
+                    <TextField
+                      label="Descrição do Serviço"
+                      fullWidth
+                      margin="normal"
+                      multiline
+                      minRows={3}
+                      value={formData.descricaoServico || ''}
+                      onChange={handleInputChange('descricaoServico')}
+                    />
+                  </>
+                )}
+
+                <Stack direction="row" spacing={2} justifyContent="flex-end" sx={{ mt: 3 }}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    disabled={loading}
+                  >
+                    Salvar Alterações
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={() => {
+                      setEditando(false);
+                      setFormData(usuario);
+                      setPreviewFoto(null);
+                      setNovaFoto(null);
+                      setErro('');
+                    }}
+                    disabled={loading}
+                  >
+                    Cancelar
+                  </Button>
+                </Stack>
+              </Box>
+            ) : (
+              <>
+                <Typography variant="h5" sx={{ fontWeight: 700, mb: 3 }}>
+                  Detalhes do Perfil
+                </Typography>
+
+                <Box sx={{ mb: 4 }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+                    Informações Pessoais
+                  </Typography>
+                  <Divider sx={{ mb: 2 }} />
+                  <Typography><strong>Nome:</strong> {usuario.nome}</Typography>
+                  <Typography><strong>Email:</strong> {usuario.email}</Typography>
+                  {usuario.telefone && <Typography><strong>Telefone:</strong> {usuario.telefone}</Typography>}
+                </Box>
+
+                <Box sx={{ mb: 4 }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+                    Endereço
+                  </Typography>
+                  <Divider sx={{ mb: 2 }} />
+                  {usuario.cep && <Typography><strong>CEP:</strong> {usuario.cep}</Typography>}
+                  {usuario.bairro && <Typography><strong>Bairro:</strong> {usuario.bairro}</Typography>}
+                  {usuario.cidade && <Typography><strong>Cidade:</strong> {usuario.cidade}</Typography>}
+                  {usuario.estado && <Typography><strong>Estado:</strong> {usuario.estado}</Typography>}
+                </Box>
+
+                {usuario.ofereceServico && (
+                  <Box>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+                      Informações Profissionais
+                    </Typography>
+                    <Divider sx={{ mb: 2 }} />
+                    {usuario.especialidade && (
+                      <Typography>
+                        <strong>Especialidade:</strong> {Especialidade[usuario.especialidade]}
+                      </Typography>
+                    )}
+                    {usuario.descricaoServico && (
+                      <Typography sx={{ mt: 1 }}>
+                        <strong>Descrição:</strong> {usuario.descricaoServico}
+                      </Typography>
+                    )}
+                  </Box>
+                )}
+              </>
+            )}
+          </Box>
+        </Box>
+      </Box>
     </Container>
   );
 };

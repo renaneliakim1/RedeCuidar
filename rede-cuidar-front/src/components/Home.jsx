@@ -208,9 +208,42 @@ const Home = () => {
                     {usuario.descricaoServico || 'Sem descrição'}
                   </Typography>
                 </CardContent>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', px: 2, pb: 2 }}>
-                  <Button size="small" onClick={() => navigate(isLoggedIn ? `/perfil/${usuario.id}` : '/bloqueado')} sx={{ color: '#0d47a1' }}>Ver Perfil</Button>
-                  <IconButton color="success" onClick={() => (isLoggedIn ? abrirWhatsapp(usuario.telefone) : navigate('/bloqueado'))}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    px: 2,
+                    pb: 2,
+                    borderRadius: 1
+                  }}
+                >
+                  <Button
+                    size="small"
+                    onClick={() => navigate(isLoggedIn ? `/perfil/${usuario.id}` : '/bloqueado')}
+                    sx={(theme) => ({
+                      color: theme.palette.mode === 'dark' ? '#ffffff' : '#0d47a1',
+                      fontWeight: 900,
+                      backgroundColor: 'transparent',
+                      boxShadow: 'none',
+                      '&:hover': {
+                        textDecoration: 'underline',
+                        backgroundColor: 'transparent',
+                        boxShadow: 'none',
+                        '&:hover': {
+                                          backgroundColor: 'transparent',
+                                          color: theme.palette.mode === 'light' ? '#0d47a1' : '#64b5f6',
+                                          textDecoration: 'none',
+                                        },
+                      }
+                    })}
+                  >
+                    Ver Perfil
+                  </Button>
+                  <IconButton
+                    color="success"
+                    onClick={() => (isLoggedIn ? abrirWhatsapp(usuario.telefone) : navigate('/bloqueado'))}
+                  >
                     <WhatsAppIcon />
                   </IconButton>
                 </Box>
