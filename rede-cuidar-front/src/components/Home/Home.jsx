@@ -202,7 +202,13 @@ const Home = () => {
                 />
                 <CardContent sx={{ textAlign: 'center' }}>
                   <Typography variant="subtitle1" fontWeight="bold">{usuario.nome}</Typography>
-                  <Typography variant="body2" color="text.secondary">{usuario.especialidade}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {usuario.especialidade
+                      .replace(/_/g, ' ')
+                      .toLowerCase()
+                      .replace(/\b\w/g, (l) => l.toUpperCase())}
+                  </Typography>
+
                   <Typography variant="body2">{usuario.bairro}, {usuario.cidade} - {usuario.estado}</Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
                     {usuario.descricaoServico
