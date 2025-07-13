@@ -1,6 +1,7 @@
 package com.redecuidar.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
@@ -15,6 +16,7 @@ public class Avaliacao {
 
     private String comentario;
 
+    @JsonFormat(pattern = "dd/MM/yyyy")
     @Column(name = "data_criacao")
     private LocalDateTime dataCriacao;
 
@@ -39,6 +41,7 @@ public class Avaliacao {
     }
 
     // Getters e setters
+
     public Long getId() {
         return id;
     }

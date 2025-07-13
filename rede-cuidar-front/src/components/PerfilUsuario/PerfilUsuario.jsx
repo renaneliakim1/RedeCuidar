@@ -11,17 +11,14 @@ import {
   TextField,
   Divider,
   Chip,
-  Paper,
-  useTheme,
-  Rating
+  useTheme
 } from '@mui/material';
 import {
   WhatsApp,
   Email,
   Phone,
   LocationOn,
-  Work,
-  Star
+  Work
 } from '@mui/icons-material';
 
 const formatarEspecialidade = (valor) => {
@@ -40,11 +37,8 @@ const PerfilUsuario = () => {
   const [novaAvaliacao, setNovaAvaliacao] = useState('');
   const [avaliacoes, setAvaliacoes] = useState([]);
   const [enviando, setEnviando] = useState(false);
-/*
-  const [notaAvaliacao, setNotaAvaliacao] = useState(5);
- */
-  const theme = useTheme();
 
+  const theme = useTheme();
   const usuarioLogadoEmail = localStorage.getItem("email");
 
   useEffect(() => {
@@ -92,22 +86,13 @@ const PerfilUsuario = () => {
         credentials: 'include',
         body: JSON.stringify({
           idAvaliado: usuario.id,
-          comentario: novaAvaliacao.trim(),
-/*
-          nota: notaAvaliacao
- */
+          comentario: novaAvaliacao.trim()
         })
       });
 
       if (!response.ok) throw new Error('Erro ao enviar avaliação');
 
-
-/*
       setNovaAvaliacao('');
-
-      setNotaAvaliacao(5);
- */
-
 
       const res = await fetch(`http://localhost:8080/avaliacoes/usuario/${id}`, {
         credentials: 'include',
@@ -150,7 +135,6 @@ const PerfilUsuario = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 6 }}>
-      {/* Removido Paper com elevation/sombra */}
       <Box sx={{
         borderRadius: 4,
         overflow: 'hidden',
@@ -197,10 +181,6 @@ const PerfilUsuario = () => {
               sx={{ mb: 3 }}
               icon={<Work />}
             />
-
-           {/*  <Typography variant="body1" sx={{ mb: 3 }}>
-              {usuario.descricaoServico || 'Descrição não informada'}
-            </Typography> */}
 
             <Box sx={{
               bgcolor: theme.palette.mode === 'light' ? '#f5f5f5' : '#1e1e1e',
@@ -260,7 +240,6 @@ const PerfilUsuario = () => {
             borderLeft: { md: `1px solid ${theme.palette.divider}` },
             pl: { md: 4 }
           }}>
-            {/* Seção de Habilidades */}
             <Box sx={{ mb: 4 }}>
               <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
                 Habilidades e Especialidades
@@ -282,7 +261,6 @@ const PerfilUsuario = () => {
               </Box>
             </Box>
 
-            {/* Seção de Sobre */}
             <Box sx={{ mb: 4 }}>
               <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
                 Sobre Mim
@@ -292,7 +270,7 @@ const PerfilUsuario = () => {
               </Typography>
             </Box>
 
-            {/* Seção de Avaliações */}
+            {/* Avaliações */}
             <Box>
               <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
                 Avaliações ({avaliacoes.length})
@@ -308,17 +286,11 @@ const PerfilUsuario = () => {
                       borderRadius: 2,
                       bgcolor: theme.palette.mode === 'light' ? '#f5f5f5' : '#1e1e1e'
                     }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                        {/* <Rating
-                          value={avaliacao.nota || 5}
-                          readOnly
-                          precision={0.5}
-                          emptyIcon={<Star fontSize="inherit" />}
-                        /> */}
-                        <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-                          {new Date(avaliacao.dataCriacao).toLocaleDateString('pt-BR')}
-                        </Typography>
-                      </Box>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                        {avaliacao.dataCriacao || 'Data não disponível'}
+
+                      </Typography>
+
                       <Typography variant="body1" sx={{ fontStyle: 'italic', mb: 1 }}>
                         "{avaliacao.comentario}"
                       </Typography>
@@ -334,14 +306,7 @@ const PerfilUsuario = () => {
               {usuarioLogadoEmail && usuarioLogadoEmail !== usuario.email && (
                 <Box sx={{ mt: 4, p: 3, bgcolor: theme.palette.background.default, borderRadius: 2 }}>
                   <Typography variant="h6" sx={{ mb: 2 }}>Deixe sua avaliação</Typography>
-                   {/*<Box sx={{ mb: 2 }}>
-                    <Typography component="legend">Nota</Typography>
-                    <Rating
-                      value={notaAvaliacao}
-                      onChange={(event, newValue) => setNotaAvaliacao(newValue)}
-                      precision={1}
-                    />
-                  </Box>*/}
+
                   <TextField
                     multiline
                     rows={4}
