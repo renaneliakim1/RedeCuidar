@@ -205,8 +205,10 @@ const AdminPage = () => {
                     {c.nomeAvaliador || 'Usuário Anônimo'}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {new Date(c.dataCriacao).toLocaleDateString('pt-BR')}
+                    {c.dataCriacao || 'Data não informada'}
+
                   </Typography>
+
                 </Box>
 
                 <Typography variant="body1" sx={{ mb: 2 }}>
